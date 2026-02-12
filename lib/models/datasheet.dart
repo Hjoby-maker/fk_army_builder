@@ -5,9 +5,9 @@ import '../services/helper/csv_parser_utils.dart';
 class Datasheet {
   final int id;
   final String name;
-  final int factionId;
-  final String sourceId;
-  final String? legend;
+  final String factionId;
+  final int sourceId;
+  final String? legend; 
   final String? role;
   final String? loadout;
   final String? transport;
@@ -39,8 +39,8 @@ class Datasheet {
     return Datasheet(
       id: CSVParserUtils.parseRequiredInt(row, 0, 'id'),
       name: row[1],
-      factionId: CSVParserUtils.parseRequiredInt(row, 2, 'factionId'),
-      sourceId: row[3],
+      factionId: row[2],
+      sourceId: CSVParserUtils.parseRequiredInt(row, 3, 'sourceId'),
       legend: row[4].isNotEmpty ? row[4] : null,
       role: row[5].isNotEmpty ? row[5] : null,
       loadout: row[6].isNotEmpty ? row[6] : null,

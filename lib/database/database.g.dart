@@ -1325,9 +1325,9 @@ class $TabilityTable extends Tability
       const VerificationMeta('factionId');
   @override
   late final GeneratedColumn<String> factionId = GeneratedColumn<String>(
-      'faction_id', aliasedName, false,
+      'faction_id', aliasedName, true,
       type: DriftSqlType.string,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES tfaction (id)'));
   static const VerificationMeta _descriptionMeta =
@@ -1365,8 +1365,6 @@ class $TabilityTable extends Tability
     if (data.containsKey('faction_id')) {
       context.handle(_factionIdMeta,
           factionId.isAcceptableOrUnknown(data['faction_id']!, _factionIdMeta));
-    } else if (isInserting) {
-      context.missing(_factionIdMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -1390,7 +1388,7 @@ class $TabilityTable extends Tability
       legend: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}legend']),
       factionId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}faction_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}faction_id']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
     );
@@ -1406,13 +1404,13 @@ class TabilityData extends DataClass implements Insertable<TabilityData> {
   final int id;
   final String name;
   final String? legend;
-  final String factionId;
+  final String? factionId;
   final String? description;
   const TabilityData(
       {required this.id,
       required this.name,
       this.legend,
-      required this.factionId,
+      this.factionId,
       this.description});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1422,7 +1420,9 @@ class TabilityData extends DataClass implements Insertable<TabilityData> {
     if (!nullToAbsent || legend != null) {
       map['legend'] = Variable<String>(legend);
     }
-    map['faction_id'] = Variable<String>(factionId);
+    if (!nullToAbsent || factionId != null) {
+      map['faction_id'] = Variable<String>(factionId);
+    }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -1435,7 +1435,9 @@ class TabilityData extends DataClass implements Insertable<TabilityData> {
       name: Value(name),
       legend:
           legend == null && nullToAbsent ? const Value.absent() : Value(legend),
-      factionId: Value(factionId),
+      factionId: factionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(factionId),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -1449,7 +1451,7 @@ class TabilityData extends DataClass implements Insertable<TabilityData> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       legend: serializer.fromJson<String?>(json['legend']),
-      factionId: serializer.fromJson<String>(json['factionId']),
+      factionId: serializer.fromJson<String?>(json['factionId']),
       description: serializer.fromJson<String?>(json['description']),
     );
   }
@@ -1460,7 +1462,7 @@ class TabilityData extends DataClass implements Insertable<TabilityData> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'legend': serializer.toJson<String?>(legend),
-      'factionId': serializer.toJson<String>(factionId),
+      'factionId': serializer.toJson<String?>(factionId),
       'description': serializer.toJson<String?>(description),
     };
   }
@@ -1469,13 +1471,13 @@ class TabilityData extends DataClass implements Insertable<TabilityData> {
           {int? id,
           String? name,
           Value<String?> legend = const Value.absent(),
-          String? factionId,
+          Value<String?> factionId = const Value.absent(),
           Value<String?> description = const Value.absent()}) =>
       TabilityData(
         id: id ?? this.id,
         name: name ?? this.name,
         legend: legend.present ? legend.value : this.legend,
-        factionId: factionId ?? this.factionId,
+        factionId: factionId.present ? factionId.value : this.factionId,
         description: description.present ? description.value : this.description,
       );
   TabilityData copyWithCompanion(TabilityCompanion data) {
@@ -1518,7 +1520,7 @@ class TabilityCompanion extends UpdateCompanion<TabilityData> {
   final Value<int> id;
   final Value<String> name;
   final Value<String?> legend;
-  final Value<String> factionId;
+  final Value<String?> factionId;
   final Value<String?> description;
   const TabilityCompanion({
     this.id = const Value.absent(),
@@ -1531,10 +1533,9 @@ class TabilityCompanion extends UpdateCompanion<TabilityData> {
     this.id = const Value.absent(),
     required String name,
     this.legend = const Value.absent(),
-    required String factionId,
+    this.factionId = const Value.absent(),
     this.description = const Value.absent(),
-  })  : name = Value(name),
-        factionId = Value(factionId);
+  }) : name = Value(name);
   static Insertable<TabilityData> custom({
     Expression<int>? id,
     Expression<String>? name,
@@ -1555,7 +1556,7 @@ class TabilityCompanion extends UpdateCompanion<TabilityData> {
       {Value<int>? id,
       Value<String>? name,
       Value<String?>? legend,
-      Value<String>? factionId,
+      Value<String?>? factionId,
       Value<String?>? description}) {
     return TabilityCompanion(
       id: id ?? this.id,
@@ -6885,11 +6886,8 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
   static const VerificationMeta _lineMeta = const VerificationMeta('line');
   @override
   late final GeneratedColumn<int> line = GeneratedColumn<int>(
-      'line', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES tfaction (id)'));
+      'line', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
@@ -6925,8 +6923,6 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
     if (data.containsKey('line')) {
       context.handle(
           _lineMeta, line.isAcceptableOrUnknown(data['line']!, _lineMeta));
-    } else if (isInserting) {
-      context.missing(_lineMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -6953,7 +6949,7 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
       datasheetId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}datasheet_id'])!,
       line: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}line'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}line']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       cost: attachedDatabase.typeMapping
@@ -6970,19 +6966,21 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
 class TdatasheetmodelcostData extends DataClass
     implements Insertable<TdatasheetmodelcostData> {
   final int datasheetId;
-  final int line;
+  final int? line;
   final String? description;
   final int cost;
   const TdatasheetmodelcostData(
       {required this.datasheetId,
-      required this.line,
+      this.line,
       this.description,
       required this.cost});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['datasheet_id'] = Variable<int>(datasheetId);
-    map['line'] = Variable<int>(line);
+    if (!nullToAbsent || line != null) {
+      map['line'] = Variable<int>(line);
+    }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -6993,7 +6991,7 @@ class TdatasheetmodelcostData extends DataClass
   TdatasheetmodelcostCompanion toCompanion(bool nullToAbsent) {
     return TdatasheetmodelcostCompanion(
       datasheetId: Value(datasheetId),
-      line: Value(line),
+      line: line == null && nullToAbsent ? const Value.absent() : Value(line),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -7006,7 +7004,7 @@ class TdatasheetmodelcostData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TdatasheetmodelcostData(
       datasheetId: serializer.fromJson<int>(json['datasheetId']),
-      line: serializer.fromJson<int>(json['line']),
+      line: serializer.fromJson<int?>(json['line']),
       description: serializer.fromJson<String?>(json['description']),
       cost: serializer.fromJson<int>(json['cost']),
     );
@@ -7016,7 +7014,7 @@ class TdatasheetmodelcostData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'datasheetId': serializer.toJson<int>(datasheetId),
-      'line': serializer.toJson<int>(line),
+      'line': serializer.toJson<int?>(line),
       'description': serializer.toJson<String?>(description),
       'cost': serializer.toJson<int>(cost),
     };
@@ -7024,12 +7022,12 @@ class TdatasheetmodelcostData extends DataClass
 
   TdatasheetmodelcostData copyWith(
           {int? datasheetId,
-          int? line,
+          Value<int?> line = const Value.absent(),
           Value<String?> description = const Value.absent(),
           int? cost}) =>
       TdatasheetmodelcostData(
         datasheetId: datasheetId ?? this.datasheetId,
-        line: line ?? this.line,
+        line: line.present ? line.value : this.line,
         description: description.present ? description.value : this.description,
         cost: cost ?? this.cost,
       );
@@ -7070,7 +7068,7 @@ class TdatasheetmodelcostData extends DataClass
 class TdatasheetmodelcostCompanion
     extends UpdateCompanion<TdatasheetmodelcostData> {
   final Value<int> datasheetId;
-  final Value<int> line;
+  final Value<int?> line;
   final Value<String?> description;
   final Value<int> cost;
   final Value<int> rowid;
@@ -7083,12 +7081,11 @@ class TdatasheetmodelcostCompanion
   });
   TdatasheetmodelcostCompanion.insert({
     required int datasheetId,
-    required int line,
+    this.line = const Value.absent(),
     this.description = const Value.absent(),
     required int cost,
     this.rowid = const Value.absent(),
   })  : datasheetId = Value(datasheetId),
-        line = Value(line),
         cost = Value(cost);
   static Insertable<TdatasheetmodelcostData> custom({
     Expression<int>? datasheetId,
@@ -7108,7 +7105,7 @@ class TdatasheetmodelcostCompanion
 
   TdatasheetmodelcostCompanion copyWith(
       {Value<int>? datasheetId,
-      Value<int>? line,
+      Value<int?>? line,
       Value<String?>? description,
       Value<int>? cost,
       Value<int>? rowid}) {
@@ -7190,6 +7187,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $TdatasheetunitcompositionTable(this);
   late final $TdatasheetmodelcostTable tdatasheetmodelcost =
       $TdatasheetmodelcostTable(this);
+  late final FactionDao factionDao = FactionDao(this as AppDatabase);
+  late final DatasheetDao datasheetDao = DatasheetDao(this as AppDatabase);
+  late final AbilityDao abilityDao = AbilityDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9227,14 +9227,14 @@ typedef $$TabilityTableCreateCompanionBuilder = TabilityCompanion Function({
   Value<int> id,
   required String name,
   Value<String?> legend,
-  required String factionId,
+  Value<String?> factionId,
   Value<String?> description,
 });
 typedef $$TabilityTableUpdateCompanionBuilder = TabilityCompanion Function({
   Value<int> id,
   Value<String> name,
   Value<String?> legend,
-  Value<String> factionId,
+  Value<String?> factionId,
   Value<String?> description,
 });
 
@@ -9245,9 +9245,9 @@ final class $$TabilityTableReferences
   static $TfactionTable _factionIdTable(_$AppDatabase db) => db.tfaction
       .createAlias($_aliasNameGenerator(db.tability.factionId, db.tfaction.id));
 
-  $$TfactionTableProcessedTableManager get factionId {
-    final $_column = $_itemColumn<String>('faction_id')!;
-
+  $$TfactionTableProcessedTableManager? get factionId {
+    final $_column = $_itemColumn<String>('faction_id');
+    if ($_column == null) return null;
     final manager = $$TfactionTableTableManager($_db, $_db.tfaction)
         .filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_factionIdTable($_db));
@@ -9470,7 +9470,7 @@ class $$TabilityTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String?> legend = const Value.absent(),
-            Value<String> factionId = const Value.absent(),
+            Value<String?> factionId = const Value.absent(),
             Value<String?> description = const Value.absent(),
           }) =>
               TabilityCompanion(
@@ -9484,7 +9484,7 @@ class $$TabilityTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             required String name,
             Value<String?> legend = const Value.absent(),
-            required String factionId,
+            Value<String?> factionId = const Value.absent(),
             Value<String?> description = const Value.absent(),
           }) =>
               TabilityCompanion.insert(
@@ -14756,7 +14756,7 @@ typedef $$TdatasheetunitcompositionTableProcessedTableManager
 typedef $$TdatasheetmodelcostTableCreateCompanionBuilder
     = TdatasheetmodelcostCompanion Function({
   required int datasheetId,
-  required int line,
+  Value<int?> line,
   Value<String?> description,
   required int cost,
   Value<int> rowid,
@@ -14764,7 +14764,7 @@ typedef $$TdatasheetmodelcostTableCreateCompanionBuilder
 typedef $$TdatasheetmodelcostTableUpdateCompanionBuilder
     = TdatasheetmodelcostCompanion Function({
   Value<int> datasheetId,
-  Value<int> line,
+  Value<int?> line,
   Value<String?> description,
   Value<int> cost,
   Value<int> rowid,
@@ -14800,6 +14800,9 @@ class $$TdatasheetmodelcostTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<int> get line => $composableBuilder(
+      column: $table.line, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnFilters(column));
 
@@ -14836,6 +14839,9 @@ class $$TdatasheetmodelcostTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<int> get line => $composableBuilder(
+      column: $table.line, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnOrderings(column));
 
@@ -14872,6 +14878,9 @@ class $$TdatasheetmodelcostTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<int> get line =>
+      $composableBuilder(column: $table.line, builder: (column) => column);
+
   GeneratedColumn<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => column);
 
@@ -14926,7 +14935,7 @@ class $$TdatasheetmodelcostTableTableManager extends RootTableManager<
                   $db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> datasheetId = const Value.absent(),
-            Value<int> line = const Value.absent(),
+            Value<int?> line = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<int> cost = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -14940,7 +14949,7 @@ class $$TdatasheetmodelcostTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             required int datasheetId,
-            required int line,
+            Value<int?> line = const Value.absent(),
             Value<String?> description = const Value.absent(),
             required int cost,
             Value<int> rowid = const Value.absent(),

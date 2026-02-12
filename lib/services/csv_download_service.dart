@@ -249,16 +249,18 @@ class CSVDownloadService {
     switch (fileName) {
       case 'Factions.csv':
         //print('Star tdelete table');
-        await _db.dropTableFactions();
+        //await _db.dropTableFactions();
         final factionsList = parsedData.cast<Faction>();
-        
         await _db.saveFactions(factionsList);
-       
         break;
-      //case 'Datasheets.csv':
-        // Сохраняем datasheets
-       // break;
-      // ... остальные case
+      case 'Datasheets.csv':
+        final datasheetList = parsedData.cast<Datasheet>();
+        await _db.saveDatasheets(datasheetList);
+        break;
+      case 'Abilities.csv':
+        final abilityList = parsedData.cast<Ability>();
+        await _db.saveAbility(abilityList);
+        break;
     }
   }
 }

@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'tables/tIndex.dart';
+import 'daos/index_dao.dart';
 
 part 'database.g.dart';
 
@@ -30,6 +31,11 @@ part 'database.g.dart';
     Tdatasheetunitcomposition,
     Tdatasheetmodelcost,
     ],
+    daos: [
+    FactionDao,
+    DatasheetDao,
+    AbilityDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
