@@ -5,9 +5,9 @@ class Tability extends Table {
   IntColumn get id => integer()();
   TextColumn get name => text().withLength(min: 1, max: 200)();
   TextColumn get legend => text().nullable()();
-  TextColumn get factionId => text().references(Tfaction, #id).nullable()();
+  TextColumn get factionId => text().nullable()(); //.references(Tfaction, #id)();
   TextColumn get description => text().nullable()();
-  
+   
   @override
   Set<Column> get primaryKey => {id};
 }

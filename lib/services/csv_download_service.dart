@@ -258,6 +258,7 @@ class CSVDownloadService {
         await _db.saveDatasheets(datasheetList);
         break;
       case 'Abilities.csv':
+        await _db.dropTableAbility();
         final abilityList = parsedData.cast<Ability>();
         await _db.saveAbility(abilityList);
         break;
