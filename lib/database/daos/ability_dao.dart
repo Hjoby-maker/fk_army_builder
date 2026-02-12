@@ -33,6 +33,15 @@ class AbilityDao extends DatabaseAccessor<AppDatabase> with _$AbilityDaoMixin {
         ..orderBy([(t) => OrderingTerm(expression: t.name)])
       ).get();
 
+
+  Future<void> debugPrintTabilitySchema() async {
+  final result = await customSelect('PRAGMA table_info(tability);').get();
+  for (final row in result) {
+    // row.data – Map<String, dynamic>
+    print('col: ${row.data['name']} | type: ${row.data['type']}');
+  }
+}
+
   // Конвертация в модели
   Future<List<models.Ability>> getAllAbilityModels() async {
     final data = await getAllAbilities();

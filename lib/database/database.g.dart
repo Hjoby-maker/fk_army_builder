@@ -1325,8 +1325,11 @@ class $TabilityTable extends Tability
       const VerificationMeta('factionId');
   @override
   late final GeneratedColumn<String> factionId = GeneratedColumn<String>(
-      'faction_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+      'factionId', aliasedName, true,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES tfaction (id)'));
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
@@ -1359,9 +1362,9 @@ class $TabilityTable extends Tability
       context.handle(_legendMeta,
           legend.isAcceptableOrUnknown(data['legend']!, _legendMeta));
     }
-    if (data.containsKey('faction_id')) {
+    if (data.containsKey('factionId')) {
       context.handle(_factionIdMeta,
-          factionId.isAcceptableOrUnknown(data['faction_id']!, _factionIdMeta));
+          factionId.isAcceptableOrUnknown(data['factionId']!, _factionIdMeta));
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -1385,7 +1388,7 @@ class $TabilityTable extends Tability
       legend: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}legend']),
       factionId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}faction_id']),
+          .read(DriftSqlType.string, data['${effectivePrefix}factionId']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
     );
@@ -1418,7 +1421,7 @@ class TabilityData extends DataClass implements Insertable<TabilityData> {
       map['legend'] = Variable<String>(legend);
     }
     if (!nullToAbsent || factionId != null) {
-      map['faction_id'] = Variable<String>(factionId);
+      map['factionId'] = Variable<String>(factionId);
     }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
@@ -1544,7 +1547,7 @@ class TabilityCompanion extends UpdateCompanion<TabilityData> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (legend != null) 'legend': legend,
-      if (factionId != null) 'faction_id': factionId,
+      if (factionId != null) 'factionId': factionId,
       if (description != null) 'description': description,
     });
   }
@@ -1577,7 +1580,7 @@ class TabilityCompanion extends UpdateCompanion<TabilityData> {
       map['legend'] = Variable<String>(legend.value);
     }
     if (factionId.present) {
-      map['faction_id'] = Variable<String>(factionId.value);
+      map['factionId'] = Variable<String>(factionId.value);
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
@@ -7247,6 +7250,21 @@ final class $$TfactionTableReferences
         manager.$state.copyWith(prefetchedData: cache));
   }
 
+  static MultiTypedResultKey<$TabilityTable, List<TabilityData>>
+      _tabilityRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.tability,
+              aliasName:
+                  $_aliasNameGenerator(db.tfaction.id, db.tability.factionId));
+
+  $$TabilityTableProcessedTableManager get tabilityRefs {
+    final manager = $$TabilityTableTableManager($_db, $_db.tability)
+        .filter((f) => f.factionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_tabilityRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
   static MultiTypedResultKey<$TdetachmentTable, List<TdetachmentData>>
       _tdetachmentRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
           db.tdetachment,
@@ -7327,6 +7345,27 @@ class $$TfactionTableFilterComposer
             $$TdatasheetTableFilterComposer(
               $db: $db,
               $table: $db.tdatasheet,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> tabilityRefs(
+      Expression<bool> Function($$TabilityTableFilterComposer f) f) {
+    final $$TabilityTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tability,
+        getReferencedColumn: (t) => t.factionId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TabilityTableFilterComposer(
+              $db: $db,
+              $table: $db.tability,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -7457,6 +7496,27 @@ class $$TfactionTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> tabilityRefs<T extends Object>(
+      Expression<T> Function($$TabilityTableAnnotationComposer a) f) {
+    final $$TabilityTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tability,
+        getReferencedColumn: (t) => t.factionId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TabilityTableAnnotationComposer(
+              $db: $db,
+              $table: $db.tability,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
   Expression<T> tdetachmentRefs<T extends Object>(
       Expression<T> Function($$TdetachmentTableAnnotationComposer a) f) {
     final $$TdetachmentTableAnnotationComposer composer = $composerBuilder(
@@ -7535,6 +7595,7 @@ class $$TfactionTableTableManager extends RootTableManager<
     TfactionData,
     PrefetchHooks Function(
         {bool tdatasheetRefs,
+        bool tabilityRefs,
         bool tdetachmentRefs,
         bool tenhancementRefs,
         bool tdetachmentabilityRefs})> {
@@ -7578,6 +7639,7 @@ class $$TfactionTableTableManager extends RootTableManager<
               .toList(),
           prefetchHooksCallback: (
               {tdatasheetRefs = false,
+              tabilityRefs = false,
               tdetachmentRefs = false,
               tenhancementRefs = false,
               tdetachmentabilityRefs = false}) {
@@ -7585,6 +7647,7 @@ class $$TfactionTableTableManager extends RootTableManager<
               db: db,
               explicitlyWatchedTables: [
                 if (tdatasheetRefs) db.tdatasheet,
+                if (tabilityRefs) db.tability,
                 if (tdetachmentRefs) db.tdetachment,
                 if (tenhancementRefs) db.tenhancement,
                 if (tdetachmentabilityRefs) db.tdetachmentability
@@ -7601,6 +7664,19 @@ class $$TfactionTableTableManager extends RootTableManager<
                         managerFromTypedResult: (p0) =>
                             $$TfactionTableReferences(db, table, p0)
                                 .tdatasheetRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.factionId == item.id),
+                        typedResults: items),
+                  if (tabilityRefs)
+                    await $_getPrefetchedData<TfactionData, $TfactionTable,
+                            TabilityData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$TfactionTableReferences._tabilityRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$TfactionTableReferences(db, table, p0)
+                                .tabilityRefs,
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
                                 .where((e) => e.factionId == item.id),
@@ -7663,6 +7739,7 @@ typedef $$TfactionTableProcessedTableManager = ProcessedTableManager<
     TfactionData,
     PrefetchHooks Function(
         {bool tdatasheetRefs,
+        bool tabilityRefs,
         bool tdetachmentRefs,
         bool tenhancementRefs,
         bool tdetachmentabilityRefs})>;
@@ -9165,6 +9242,20 @@ final class $$TabilityTableReferences
     extends BaseReferences<_$AppDatabase, $TabilityTable, TabilityData> {
   $$TabilityTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
+  static $TfactionTable _factionIdTable(_$AppDatabase db) => db.tfaction
+      .createAlias($_aliasNameGenerator(db.tability.factionId, db.tfaction.id));
+
+  $$TfactionTableProcessedTableManager? get factionId {
+    final $_column = $_itemColumn<String>('factionId');
+    if ($_column == null) return null;
+    final manager = $$TfactionTableTableManager($_db, $_db.tfaction)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_factionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
   static MultiTypedResultKey<$TdatasheetabilityTable,
       List<TdatasheetabilityData>> _tdatasheetabilityRefsTable(
           _$AppDatabase db) =>
@@ -9202,11 +9293,28 @@ class $$TabilityTableFilterComposer
   ColumnFilters<String> get legend => $composableBuilder(
       column: $table.legend, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get factionId => $composableBuilder(
-      column: $table.factionId, builder: (column) => ColumnFilters(column));
-
   ColumnFilters<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnFilters(column));
+
+  $$TfactionTableFilterComposer get factionId {
+    final $$TfactionTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.factionId,
+        referencedTable: $db.tfaction,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TfactionTableFilterComposer(
+              $db: $db,
+              $table: $db.tfaction,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
   Expression<bool> tdatasheetabilityRefs(
       Expression<bool> Function($$TdatasheetabilityTableFilterComposer f) f) {
@@ -9248,11 +9356,28 @@ class $$TabilityTableOrderingComposer
   ColumnOrderings<String> get legend => $composableBuilder(
       column: $table.legend, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get factionId => $composableBuilder(
-      column: $table.factionId, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  $$TfactionTableOrderingComposer get factionId {
+    final $$TfactionTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.factionId,
+        referencedTable: $db.tfaction,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TfactionTableOrderingComposer(
+              $db: $db,
+              $table: $db.tfaction,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 }
 
 class $$TabilityTableAnnotationComposer
@@ -9273,11 +9398,28 @@ class $$TabilityTableAnnotationComposer
   GeneratedColumn<String> get legend =>
       $composableBuilder(column: $table.legend, builder: (column) => column);
 
-  GeneratedColumn<String> get factionId =>
-      $composableBuilder(column: $table.factionId, builder: (column) => column);
-
   GeneratedColumn<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => column);
+
+  $$TfactionTableAnnotationComposer get factionId {
+    final $$TfactionTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.factionId,
+        referencedTable: $db.tfaction,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TfactionTableAnnotationComposer(
+              $db: $db,
+              $table: $db.tfaction,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
   Expression<T> tdatasheetabilityRefs<T extends Object>(
       Expression<T> Function($$TdatasheetabilityTableAnnotationComposer a) f) {
@@ -9313,7 +9455,7 @@ class $$TabilityTableTableManager extends RootTableManager<
     $$TabilityTableUpdateCompanionBuilder,
     (TabilityData, $$TabilityTableReferences),
     TabilityData,
-    PrefetchHooks Function({bool tdatasheetabilityRefs})> {
+    PrefetchHooks Function({bool factionId, bool tdatasheetabilityRefs})> {
   $$TabilityTableTableManager(_$AppDatabase db, $TabilityTable table)
       : super(TableManagerState(
           db: db,
@@ -9356,13 +9498,39 @@ class $$TabilityTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$TabilityTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({tdatasheetabilityRefs = false}) {
+          prefetchHooksCallback: (
+              {factionId = false, tdatasheetabilityRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (tdatasheetabilityRefs) db.tdatasheetability
               ],
-              addJoins: null,
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (factionId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.factionId,
+                    referencedTable:
+                        $$TabilityTableReferences._factionIdTable(db),
+                    referencedColumn:
+                        $$TabilityTableReferences._factionIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (tdatasheetabilityRefs)
@@ -9396,7 +9564,7 @@ typedef $$TabilityTableProcessedTableManager = ProcessedTableManager<
     $$TabilityTableUpdateCompanionBuilder,
     (TabilityData, $$TabilityTableReferences),
     TabilityData,
-    PrefetchHooks Function({bool tdatasheetabilityRefs})>;
+    PrefetchHooks Function({bool factionId, bool tdatasheetabilityRefs})>;
 typedef $$TdetachmentTableCreateCompanionBuilder = TdetachmentCompanion
     Function({
   Value<int> id,

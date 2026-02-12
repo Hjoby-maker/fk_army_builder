@@ -44,6 +44,8 @@ class DatabaseService {
 
   Future dropTableAbility() => _abilityDao.dropAndRecreateTable();
 
+  Future debugPrintTability() => _abilityDao.debugPrintTabilitySchema();
+
     // --- Faction methods ---
   Future<List<Datasheet>> getAllDatasheet() => _datasheetDao.getAllDatasheetModels();
 
