@@ -1,3 +1,42 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+pubspec.lock
+**/doc/api/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Build
+build/
+/android/app/build
+/ios/build
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/flutter_export_environment.sh
+
+# MacOS
+.DS_Store
+
+# Другие временные файлы
+*.log
+*.tmp
+*.bak
+
+# Не загружаем базу данных на GitHub
+*.sqlite
+*.sqlite3
+*.db
+
+# Файлы окружения
+.env
+.env.local
+
+# Скачанные CSV файлы (они будут подгружаться приложением)
+*.csv
+
 # Miscellaneous
 *.class
 *.log
