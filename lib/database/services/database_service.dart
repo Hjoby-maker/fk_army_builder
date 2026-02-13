@@ -1,9 +1,11 @@
 //import 'package:drift/drift.dart';
 //import 'dart:ffi';
 
+import 'package:fk_army_builder/database/daos/datasheet_ability_dao.dart';
+import 'package:fk_army_builder/database/daos/datasheet_model_dao.dart';
+import 'package:fk_army_builder/database/daos/enhancement_dao.dart';
 import 'package:fk_army_builder/database/daos/index_dao.dart';
 import 'package:fk_army_builder/database/database.dart';
-import 'package:fk_army_builder/database/daos/faction_dao.dart';
 import 'package:fk_army_builder/database/converters/model_to_companion.dart';
 import 'package:fk_army_builder/models/index.dart';
 
@@ -16,12 +18,18 @@ class DatabaseService {
   late FactionDao _factionDao;
   late AbilityDao _abilityDao;
   late DatasheetDao _datasheetDao;
+  late DatasheetAbilityDao _datasheetAbilityDao;
+  late DatasheetModelDao _datasheetModelDao;
+  late EnhancementDao _enhancementDao;
 
   Future<void> initialize() async {
     _database = AppDatabase();
     _factionDao = FactionDao(_database);
     _abilityDao = AbilityDao(_database);
     _datasheetDao = DatasheetDao(_database);
+    _datasheetAbilityDao = DatasheetAbilityDao(_database);
+    _datasheetModelDao = DatasheetModelDao(_database);
+    _enhancementDao = EnhancementDao(_database);
   }
 
   // --- Faction methods ---
@@ -46,7 +54,7 @@ class DatabaseService {
 
   Future debugPrintTability() => _abilityDao.debugPrintTabilitySchema();
 
-    // --- Faction methods ---
+    // --- Datasheet methods ---
   Future<List<Datasheet>> getAllDatasheet() => _datasheetDao.getAllDatasheetModels();
 
   Future<void> saveDatasheets(List<Datasheet> datasheets) {
@@ -55,6 +63,30 @@ class DatabaseService {
   }
 
   Future dropTableDatasheet() => _datasheetDao.dropAndRecreateTable();
+
+    // --- DatasheetAbility methods ---
+  Future<List<DatasheetAbility>> getAllDatasheetAbility() => _datasheetAbilityDao.getAllDatasheetAbilityModels();
+
+  Future<void> saveDatasheetsAbility(List<DatasheetAbility> datasheetAbilities) {
+    final companions = datasheetAbilities.map(ModelToCompanion.fromDatasheetAbility).toList();
+    return _datasheetAbilityDao.insertAll(companions);
+  }
+
+      // --- DatasheetModel methods ---
+  Future<List<DatasheetModel>> getAllDatasheetModel() => _datasheetModelDao.getAllDatasheetModels();
+
+  Future<void> saveDatasheetsModel(List<DatasheetModel> datasheetsModels) {
+    final companions = datasheetsModels.map(ModelToCompanion.fromDatasheetModel).toList();
+    return _datasheetModelDao.insertAll(companions);
+  }
+
+// --- DatasheetModel methods ---
+  Future<List<Enhancement>> getAllEnhacment() => _enhancementDao.getAllEnhancementModels();
+
+  Future<void> saveEnhancement(List<Enhancement> enhancement) {
+    final companions = enhancement.map(ModelToCompanion.fromEnhacement).toList();
+    return _enhancementDao.insertAllEnhancements(companions);
+  }
 
   // Очистка БД при перезагрузке данных
   Future<void> clearAllData() async {

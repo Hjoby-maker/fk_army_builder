@@ -2,6 +2,13 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:fk_army_builder/database/daos/datasheet_ability_dao.dart';
+import 'package:fk_army_builder/database/daos/datasheet_model_dao.dart';
+import 'package:fk_army_builder/database/daos/detachment_dao.dart';
+import 'package:fk_army_builder/database/daos/enhancement_dao.dart';
+import 'package:fk_army_builder/database/daos/last_update_dao.dart';
+import 'package:fk_army_builder/database/daos/source_dao.dart';
+import 'package:fk_army_builder/database/daos/stratagem_dao.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'tables/tIndex.dart';
@@ -35,6 +42,13 @@ part 'database.g.dart';
     FactionDao,
     DatasheetDao,
     AbilityDao,
+    DatasheetAbilityDao,
+    DatasheetModelDao,
+    DetachmentDao,
+    EnhancementDao,
+    LastUpdateDao,
+    SourceDao,
+    StratagemDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

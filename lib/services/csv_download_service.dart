@@ -263,6 +263,19 @@ class CSVDownloadService {
         final abilityList = parsedData.cast<Ability>();
         await _db.saveAbility(abilityList);
         break;
+      case 'Datasheets_abilities.csv':
+        //await _db.dropTableAbility();
+        final datasheetAbilityList = parsedData.cast<DatasheetAbility>();
+        await _db.saveDatasheetsAbility(datasheetAbilityList);
+        break;
+      case 'Datasheets_models.csv':
+        final datasheetsModelsList = parsedData.cast<DatasheetModel>();
+        await _db.saveDatasheetsModel(datasheetsModelsList);
+        break;
+      case 'Enhancements.csv':
+        final enhancementList = parsedData.cast<Enhancement>();
+        await _db.saveEnhancement(enhancementList);
+        break;
     }
   }
 }

@@ -41,5 +41,48 @@ class ModelToCompanion {
     );
  }
 
+static TdatasheetabilityCompanion fromDatasheetAbility(models.DatasheetAbility datasheetAbility) {
+   return TdatasheetabilityCompanion (
+      datasheetId: Value(datasheetAbility.datasheetId),
+      line: Value(datasheetAbility.line),
+      abilityId: Value(datasheetAbility.abilityId),
+      model: Value(datasheetAbility.model),
+      name: Value(datasheetAbility.name),
+      description: Value(datasheetAbility.description),
+      type: Value(datasheetAbility.type),
+      parameter: Value(datasheetAbility.parameter),
+    );
+ }
+
+ static TdatasheetmodelCompanion fromDatasheetModel(models.DatasheetModel datasheetModel) {
+   return TdatasheetmodelCompanion (
+      datasheetId: Value(datasheetModel.datasheetId),
+      line: Value(datasheetModel.line),
+      name: Value(datasheetModel.name),
+      move: Value(datasheetModel.move),
+      toughness: Value(datasheetModel.toughness),
+      save: Value(datasheetModel.save),
+      invulnerableSave: Value(datasheetModel.invulnerableSave),
+      invulnerableSaveDescription: Value(datasheetModel.invulnerableSaveDescription),
+      wounds: Value(datasheetModel.wounds),
+      leadership: Value(datasheetModel.leadership),
+      objectiveControl: Value(datasheetModel.objectiveControl),
+      baseSize: Value(datasheetModel.baseSize),
+      baseSizeDescription: Value(datasheetModel.baseSizeDescription),
+    );
+ }
+
+static TenhancementCompanion fromEnhacement(models.Enhancement enhancement) {
+   return TenhancementCompanion (
+      factionId: Value(enhancement.factionId),
+      id: Value(enhancement.id),
+      name: Value(enhancement.name),
+      cost: Value(enhancement.cost),
+      detachment: Value(enhancement.detachment),
+      detachmentId: Value(enhancement.detachmentId),
+      legend: Value(enhancement.legend),
+      description: Value(enhancement.description),
+    );
+ }
 
 }

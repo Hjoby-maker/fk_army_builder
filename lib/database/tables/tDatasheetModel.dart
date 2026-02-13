@@ -15,4 +15,7 @@ class Tdatasheetmodel extends Table {
   IntColumn get objectiveControl => integer()();
   TextColumn get baseSize => text()();
   TextColumn get baseSizeDescription => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {datasheetId, line};
 }
