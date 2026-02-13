@@ -8,7 +8,7 @@ class Tsource extends Table {
   TextColumn get version => text().nullable()();
   DateTimeColumn get errataDate => dateTime().nullable()();
   TextColumn get errataLink => text().nullable()();
-  
+   
   @override
   Set<Column> get primaryKey => {id};
 }

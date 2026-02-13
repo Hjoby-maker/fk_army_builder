@@ -1925,8 +1925,8 @@ class $TenhancementTable extends Tenhancement
   static const VerificationMeta _costMeta = const VerificationMeta('cost');
   @override
   late final GeneratedColumn<int> cost = GeneratedColumn<int>(
-      'cost', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      'cost', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _detachmentMeta =
       const VerificationMeta('detachment');
   @override
@@ -1992,6 +1992,8 @@ class $TenhancementTable extends Tenhancement
     if (data.containsKey('cost')) {
       context.handle(
           _costMeta, cost.isAcceptableOrUnknown(data['cost']!, _costMeta));
+    } else if (isInserting) {
+      context.missing(_costMeta);
     }
     if (data.containsKey('detachment')) {
       context.handle(
@@ -2039,7 +2041,7 @@ class $TenhancementTable extends Tenhancement
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       cost: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}cost']),
+          .read(DriftSqlType.int, data['${effectivePrefix}cost'])!,
       detachment: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}detachment'])!,
       detachmentId: attachedDatabase.typeMapping
@@ -2062,7 +2064,7 @@ class TenhancementData extends DataClass
   final String factionId;
   final int id;
   final String name;
-  final int? cost;
+  final int cost;
   final String detachment;
   final int detachmentId;
   final String legend;
@@ -2071,7 +2073,7 @@ class TenhancementData extends DataClass
       {required this.factionId,
       required this.id,
       required this.name,
-      this.cost,
+      required this.cost,
       required this.detachment,
       required this.detachmentId,
       required this.legend,
@@ -2082,9 +2084,7 @@ class TenhancementData extends DataClass
     map['faction_id'] = Variable<String>(factionId);
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    if (!nullToAbsent || cost != null) {
-      map['cost'] = Variable<int>(cost);
-    }
+    map['cost'] = Variable<int>(cost);
     map['detachment'] = Variable<String>(detachment);
     map['detachment_id'] = Variable<int>(detachmentId);
     map['legend'] = Variable<String>(legend);
@@ -2097,7 +2097,7 @@ class TenhancementData extends DataClass
       factionId: Value(factionId),
       id: Value(id),
       name: Value(name),
-      cost: cost == null && nullToAbsent ? const Value.absent() : Value(cost),
+      cost: Value(cost),
       detachment: Value(detachment),
       detachmentId: Value(detachmentId),
       legend: Value(legend),
@@ -2112,7 +2112,7 @@ class TenhancementData extends DataClass
       factionId: serializer.fromJson<String>(json['factionId']),
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      cost: serializer.fromJson<int?>(json['cost']),
+      cost: serializer.fromJson<int>(json['cost']),
       detachment: serializer.fromJson<String>(json['detachment']),
       detachmentId: serializer.fromJson<int>(json['detachmentId']),
       legend: serializer.fromJson<String>(json['legend']),
@@ -2126,7 +2126,7 @@ class TenhancementData extends DataClass
       'factionId': serializer.toJson<String>(factionId),
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'cost': serializer.toJson<int?>(cost),
+      'cost': serializer.toJson<int>(cost),
       'detachment': serializer.toJson<String>(detachment),
       'detachmentId': serializer.toJson<int>(detachmentId),
       'legend': serializer.toJson<String>(legend),
@@ -2138,7 +2138,7 @@ class TenhancementData extends DataClass
           {String? factionId,
           int? id,
           String? name,
-          Value<int?> cost = const Value.absent(),
+          int? cost,
           String? detachment,
           int? detachmentId,
           String? legend,
@@ -2147,7 +2147,7 @@ class TenhancementData extends DataClass
         factionId: factionId ?? this.factionId,
         id: id ?? this.id,
         name: name ?? this.name,
-        cost: cost.present ? cost.value : this.cost,
+        cost: cost ?? this.cost,
         detachment: detachment ?? this.detachment,
         detachmentId: detachmentId ?? this.detachmentId,
         legend: legend ?? this.legend,
@@ -2206,7 +2206,7 @@ class TenhancementCompanion extends UpdateCompanion<TenhancementData> {
   final Value<String> factionId;
   final Value<int> id;
   final Value<String> name;
-  final Value<int?> cost;
+  final Value<int> cost;
   final Value<String> detachment;
   final Value<int> detachmentId;
   final Value<String> legend;
@@ -2225,13 +2225,14 @@ class TenhancementCompanion extends UpdateCompanion<TenhancementData> {
     required String factionId,
     this.id = const Value.absent(),
     required String name,
-    this.cost = const Value.absent(),
+    required int cost,
     required String detachment,
     required int detachmentId,
     required String legend,
     required String description,
   })  : factionId = Value(factionId),
         name = Value(name),
+        cost = Value(cost),
         detachment = Value(detachment),
         detachmentId = Value(detachmentId),
         legend = Value(legend),
@@ -2262,7 +2263,7 @@ class TenhancementCompanion extends UpdateCompanion<TenhancementData> {
       {Value<String>? factionId,
       Value<int>? id,
       Value<String>? name,
-      Value<int?>? cost,
+      Value<int>? cost,
       Value<String>? detachment,
       Value<int>? detachmentId,
       Value<String>? legend,
@@ -10070,7 +10071,7 @@ typedef $$TenhancementTableCreateCompanionBuilder = TenhancementCompanion
   required String factionId,
   Value<int> id,
   required String name,
-  Value<int?> cost,
+  required int cost,
   required String detachment,
   required int detachmentId,
   required String legend,
@@ -10081,7 +10082,7 @@ typedef $$TenhancementTableUpdateCompanionBuilder = TenhancementCompanion
   Value<String> factionId,
   Value<int> id,
   Value<String> name,
-  Value<int?> cost,
+  Value<int> cost,
   Value<String> detachment,
   Value<int> detachmentId,
   Value<String> legend,
@@ -10419,7 +10420,7 @@ class $$TenhancementTableTableManager extends RootTableManager<
             Value<String> factionId = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
-            Value<int?> cost = const Value.absent(),
+            Value<int> cost = const Value.absent(),
             Value<String> detachment = const Value.absent(),
             Value<int> detachmentId = const Value.absent(),
             Value<String> legend = const Value.absent(),
@@ -10439,7 +10440,7 @@ class $$TenhancementTableTableManager extends RootTableManager<
             required String factionId,
             Value<int> id = const Value.absent(),
             required String name,
-            Value<int?> cost = const Value.absent(),
+            required int cost,
             required String detachment,
             required int detachmentId,
             required String legend,

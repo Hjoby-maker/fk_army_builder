@@ -9,21 +9,18 @@ part 'detachment_dao.g.dart';
 class DetachmentDao extends DatabaseAccessor<AppDatabase> with _$DetachmentDaoMixin {
   DetachmentDao(AppDatabase db) : super(db);
 
-  // CRUD
+  // CRUD 
   Future<List<TdetachmentData>> getAllDetachments() => select(tdetachment).get();
   
-  Future<TdetachmentData?> getDetachmentById(String id) =>
+  Future<TdetachmentData?> getDetachmentById(int id) =>
       (select(tdetachment)..where((t) => t.id.equals(id))).getSingleOrNull();
-  
-  Future<int> insertDetachment(TdetachmentCompanion detachment) =>
-      into(tdetachment).insert(detachment);
   
   Future<void> insertAllDetachments(List<TdetachmentCompanion> detachmentsList) =>
       batch((batch) {
         batch.insertAllOnConflictUpdate(tdetachment, detachmentsList);
       });
   
-  Future<int> deleteDetachment(String id) =>
+  Future<int> deleteDetachment(int id) =>
       (delete(tdetachment)..where((t) => t.id.equals(id))).go();
 
   // Поиск
@@ -41,26 +38,10 @@ class DetachmentDao extends DatabaseAccessor<AppDatabase> with _$DetachmentDaoMi
     final data = await getAllDetachments();
     return data.map((d) => models.Detachment(
       id: d.id,
-      name: d.name,
       factionId: d.factionId,
-      sourceId: d.sourceId,
-      link: d.link,
-      description: d.description,
+      name: d.name,
+      legend: d.legend,
+      type: d.type,
     )).toList();
-  }
-
-  Future<void> dropAndRecreateTable() async {
-    await customStatement('DROP TABLE IF EXISTS tdetachment');
-    await customStatement('''
-      CREATE TABLE tdetachment (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        faction_id TEXT,
-        source_id TEXT,
-        link TEXT,
-        description TEXT
-      )
-    ''');
-    print('Таблица tdetachment пересоздана');
   }
 }

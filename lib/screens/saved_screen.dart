@@ -186,7 +186,7 @@ class _SavedScreenState extends State<SavedScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            _buildDetailRow('ID', '${faction.id}'),
+            _buildDetailRow('ID', faction.id),
             const Divider(),
             _buildDetailRow('Название', faction.name),
             if (faction.link != null) ...[

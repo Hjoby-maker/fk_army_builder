@@ -12,7 +12,7 @@ class StratagemDao extends DatabaseAccessor<AppDatabase> with _$StratagemDaoMixi
   // CRUD
   Future<List<TstratagemData>> getAllStratagems() => select(tstratagem).get();
   
-  Future<TstratagemData?> getStratagemById(String id) =>
+  Future<TstratagemData?> getStratagemById(int id) =>
       (select(tstratagem)..where((t) => t.id.equals(id))).getSingleOrNull();
   
   Future<int> insertStratagem(TstratagemCompanion stratagem) =>
@@ -23,34 +23,30 @@ class StratagemDao extends DatabaseAccessor<AppDatabase> with _$StratagemDaoMixi
         batch.insertAllOnConflictUpdate(tstratagem, stratagemsList);
       });
   
-  Future<int> deleteStratagem(String id) =>
+  Future<int> deleteStratagem(int id) =>
       (delete(tstratagem)..where((t) => t.id.equals(id))).go();
-
-  // Поиск
-  Future<List<TstratagemData>> searchStratagems(String query) =>
-      (select(tstratagem)
-        ..where((t) => t.name.like('%$query%'))
-        ..orderBy([(t) => OrderingTerm(expression: t.name)])
-      ).get();
   
-  Future<List<TstratagemData>> getStratagemsByDetachment(String detachmentId) =>
+  Future<List<TstratagemData>> getStratagemsByDetachment(int detachmentId) =>
       (select(tstratagem)..where((t) => t.detachmentId.equals(detachmentId))).get();
+
+  Future<List<TstratagemData>> getStratagemsByFaction(String factionId) =>
+      (select(tstratagem)..where((t) => t.factionId.equals(factionId))).get();
 
   // Конвертация в модели
   Future<List<models.Stratagem>> getAllStratagemModels() async {
     final data = await getAllStratagems();
     return data.map((s) => models.Stratagem(
-      id: s.id,
+      factionId: s.factionId,
       name: s.name,
+      id: s.id,
+      type: s.type,
+      commandPointCost: s.commandPointCost,
+      legend: s.legend,
+      turn: s.turn,
+      phase: s.phase,
+      detachment: s.detachment,
+      detachmentId: s.detachmentId,      
       description: s.description,
-      detachmentId: s.detachmentId,
-      sourceId: s.sourceId,
-      link: s.link,
-      cpCost: s.cpCost,
-      when: s.when,
-      target: s.target,
-      effect: s.effect,
-      restrictions: s.restrictions,
     )).toList();
   }
 

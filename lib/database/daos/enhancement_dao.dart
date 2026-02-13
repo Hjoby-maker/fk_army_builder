@@ -12,18 +12,15 @@ class EnhancementDao extends DatabaseAccessor<AppDatabase> with _$EnhancementDao
   // CRUD
   Future<List<TenhancementData>> getAllEnhancements() => select(tenhancement).get();
   
-  Future<TenhancementData?> getEnhancementById(String id) =>
+  Future<TenhancementData?> getEnhancementById(int id) =>
       (select(tenhancement)..where((t) => t.id.equals(id))).getSingleOrNull();
-  
-  Future<int> insertEnhancement(TenhancementCompanion enhancement) =>
-      into(tenhancement).insert(enhancement);
   
   Future<void> insertAllEnhancements(List<TenhancementCompanion> enhancementsList) =>
       batch((batch) {
         batch.insertAllOnConflictUpdate(tenhancement, enhancementsList);
       });
   
-  Future<int> deleteEnhancement(String id) =>
+  Future<int> deleteEnhancement(int id) =>
       (delete(tenhancement)..where((t) => t.id.equals(id))).go();
 
   // Поиск
@@ -33,36 +30,22 @@ class EnhancementDao extends DatabaseAccessor<AppDatabase> with _$EnhancementDao
         ..orderBy([(t) => OrderingTerm(expression: t.name)])
       ).get();
   
-  Future<List<TenhancementData>> getEnhancementsByDetachment(String detachmentId) =>
+  Future<List<TenhancementData>> getEnhancementsByDetachment(int detachmentId) =>
       (select(tenhancement)..where((t) => t.detachmentId.equals(detachmentId))).get();
 
   // Конвертация в модели
   Future<List<models.Enhancement>> getAllEnhancementModels() async {
     final data = await getAllEnhancements();
     return data.map((e) => models.Enhancement(
+      factionId: e.factionId,
       id: e.id,
       name: e.name,
-      description: e.description,
-      detachmentId: e.detachmentId,
-      sourceId: e.sourceId,
-      link: e.link,
       cost: e.cost,
+      detachment: e.detachment,
+      detachmentId: e.detachmentId,
+      legend: e.legend,
+      description: e.description,
     )).toList();
   }
 
-  Future<void> dropAndRecreateTable() async {
-    await customStatement('DROP TABLE IF EXISTS tenhancement');
-    await customStatement('''
-      CREATE TABLE tenhancement (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        description TEXT NOT NULL,
-        detachment_id TEXT,
-        source_id TEXT,
-        link TEXT,
-        cost INTEGER
-      )
-    ''');
-    print('Таблица tenhancement пересоздана');
-  }
 }

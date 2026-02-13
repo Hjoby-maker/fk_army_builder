@@ -7,7 +7,7 @@ part 'faction_dao.g.dart';
 
 @DriftAccessor(tables: [Tfaction])
 class FactionDao extends DatabaseAccessor<AppDatabase> with _$FactionDaoMixin {
-  FactionDao(AppDatabase db) : super(db);
+  FactionDao(super.db);
 
   // Базовые CRUD операции
   Future<List<TfactionData>> getAllFactions() => select(tfaction).get();
