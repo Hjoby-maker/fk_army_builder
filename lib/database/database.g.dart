@@ -4171,8 +4171,8 @@ class $TdatasheetwargearTable extends Tdatasheetwargear
       const VerificationMeta('lineInWargear');
   @override
   late final GeneratedColumn<int> lineInWargear = GeneratedColumn<int>(
-      'line_in_wargear', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      'line_in_wargear', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _diceMeta = const VerificationMeta('dice');
   @override
   late final GeneratedColumn<String> dice = GeneratedColumn<String>(
@@ -4275,6 +4275,8 @@ class $TdatasheetwargearTable extends Tdatasheetwargear
           _lineInWargearMeta,
           lineInWargear.isAcceptableOrUnknown(
               data['line_in_wargear']!, _lineInWargearMeta));
+    } else if (isInserting) {
+      context.missing(_lineInWargearMeta);
     }
     if (data.containsKey('dice')) {
       context.handle(
@@ -4328,7 +4330,7 @@ class $TdatasheetwargearTable extends Tdatasheetwargear
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {datasheetId, lineInWargear};
   @override
   TdatasheetwargearData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -4338,7 +4340,7 @@ class $TdatasheetwargearTable extends Tdatasheetwargear
       line: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}line']),
       lineInWargear: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}line_in_wargear']),
+          .read(DriftSqlType.int, data['${effectivePrefix}line_in_wargear'])!,
       dice: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}dice'])!,
       name: attachedDatabase.typeMapping
@@ -4372,7 +4374,7 @@ class TdatasheetwargearData extends DataClass
     implements Insertable<TdatasheetwargearData> {
   final int datasheetId;
   final int? line;
-  final int? lineInWargear;
+  final int lineInWargear;
   final String dice;
   final String? name;
   final String? description;
@@ -4386,7 +4388,7 @@ class TdatasheetwargearData extends DataClass
   const TdatasheetwargearData(
       {required this.datasheetId,
       this.line,
-      this.lineInWargear,
+      required this.lineInWargear,
       required this.dice,
       this.name,
       this.description,
@@ -4404,9 +4406,7 @@ class TdatasheetwargearData extends DataClass
     if (!nullToAbsent || line != null) {
       map['line'] = Variable<int>(line);
     }
-    if (!nullToAbsent || lineInWargear != null) {
-      map['line_in_wargear'] = Variable<int>(lineInWargear);
-    }
+    map['line_in_wargear'] = Variable<int>(lineInWargear);
     map['dice'] = Variable<String>(dice);
     if (!nullToAbsent || name != null) {
       map['name'] = Variable<String>(name);
@@ -4442,9 +4442,7 @@ class TdatasheetwargearData extends DataClass
     return TdatasheetwargearCompanion(
       datasheetId: Value(datasheetId),
       line: line == null && nullToAbsent ? const Value.absent() : Value(line),
-      lineInWargear: lineInWargear == null && nullToAbsent
-          ? const Value.absent()
-          : Value(lineInWargear),
+      lineInWargear: Value(lineInWargear),
       dice: Value(dice),
       name: name == null && nullToAbsent ? const Value.absent() : Value(name),
       description: description == null && nullToAbsent
@@ -4476,7 +4474,7 @@ class TdatasheetwargearData extends DataClass
     return TdatasheetwargearData(
       datasheetId: serializer.fromJson<int>(json['datasheetId']),
       line: serializer.fromJson<int?>(json['line']),
-      lineInWargear: serializer.fromJson<int?>(json['lineInWargear']),
+      lineInWargear: serializer.fromJson<int>(json['lineInWargear']),
       dice: serializer.fromJson<String>(json['dice']),
       name: serializer.fromJson<String?>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
@@ -4495,7 +4493,7 @@ class TdatasheetwargearData extends DataClass
     return <String, dynamic>{
       'datasheetId': serializer.toJson<int>(datasheetId),
       'line': serializer.toJson<int?>(line),
-      'lineInWargear': serializer.toJson<int?>(lineInWargear),
+      'lineInWargear': serializer.toJson<int>(lineInWargear),
       'dice': serializer.toJson<String>(dice),
       'name': serializer.toJson<String?>(name),
       'description': serializer.toJson<String?>(description),
@@ -4512,7 +4510,7 @@ class TdatasheetwargearData extends DataClass
   TdatasheetwargearData copyWith(
           {int? datasheetId,
           Value<int?> line = const Value.absent(),
-          Value<int?> lineInWargear = const Value.absent(),
+          int? lineInWargear,
           String? dice,
           Value<String?> name = const Value.absent(),
           Value<String?> description = const Value.absent(),
@@ -4526,8 +4524,7 @@ class TdatasheetwargearData extends DataClass
       TdatasheetwargearData(
         datasheetId: datasheetId ?? this.datasheetId,
         line: line.present ? line.value : this.line,
-        lineInWargear:
-            lineInWargear.present ? lineInWargear.value : this.lineInWargear,
+        lineInWargear: lineInWargear ?? this.lineInWargear,
         dice: dice ?? this.dice,
         name: name.present ? name.value : this.name,
         description: description.present ? description.value : this.description,
@@ -4626,7 +4623,7 @@ class TdatasheetwargearCompanion
     extends UpdateCompanion<TdatasheetwargearData> {
   final Value<int> datasheetId;
   final Value<int?> line;
-  final Value<int?> lineInWargear;
+  final Value<int> lineInWargear;
   final Value<String> dice;
   final Value<String?> name;
   final Value<String?> description;
@@ -4657,7 +4654,7 @@ class TdatasheetwargearCompanion
   TdatasheetwargearCompanion.insert({
     required int datasheetId,
     this.line = const Value.absent(),
-    this.lineInWargear = const Value.absent(),
+    required int lineInWargear,
     required String dice,
     this.name = const Value.absent(),
     this.description = const Value.absent(),
@@ -4670,6 +4667,7 @@ class TdatasheetwargearCompanion
     this.damage = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : datasheetId = Value(datasheetId),
+        lineInWargear = Value(lineInWargear),
         dice = Value(dice);
   static Insertable<TdatasheetwargearData> custom({
     Expression<int>? datasheetId,
@@ -4708,7 +4706,7 @@ class TdatasheetwargearCompanion
   TdatasheetwargearCompanion copyWith(
       {Value<int>? datasheetId,
       Value<int?>? line,
-      Value<int?>? lineInWargear,
+      Value<int>? lineInWargear,
       Value<String>? dice,
       Value<String?>? name,
       Value<String?>? description,
@@ -5172,7 +5170,7 @@ class $TdatasheetoptionTable extends Tdatasheetoption
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {datasheetId, line};
   @override
   TdatasheetoptionData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -5645,7 +5643,7 @@ class $TdatasheetstratagemTable extends Tdatasheetstratagem
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {datasheetId, stratagemId};
   @override
   TdatasheetstratagemData map(Map<String, dynamic> data,
       {String? tablePrefix}) {
@@ -6629,11 +6627,11 @@ class $TdatasheetunitcompositionTable extends Tdatasheetunitcomposition
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $TdatasheetunitcompositionTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _datasheetIdidMeta =
-      const VerificationMeta('datasheetIdid');
+  static const VerificationMeta _datasheetIdMeta =
+      const VerificationMeta('datasheetId');
   @override
-  late final GeneratedColumn<int> datasheetIdid = GeneratedColumn<int>(
-      'datasheet_idid', aliasedName, false,
+  late final GeneratedColumn<int> datasheetId = GeneratedColumn<int>(
+      'datasheet_id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       defaultConstraints:
@@ -6653,7 +6651,7 @@ class $TdatasheetunitcompositionTable extends Tdatasheetunitcomposition
       type: DriftSqlType.string,
       requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [datasheetIdid, line, description];
+  List<GeneratedColumn> get $columns => [datasheetId, line, description];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -6665,13 +6663,13 @@ class $TdatasheetunitcompositionTable extends Tdatasheetunitcomposition
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('datasheet_idid')) {
+    if (data.containsKey('datasheet_id')) {
       context.handle(
-          _datasheetIdidMeta,
-          datasheetIdid.isAcceptableOrUnknown(
-              data['datasheet_idid']!, _datasheetIdidMeta));
+          _datasheetIdMeta,
+          datasheetId.isAcceptableOrUnknown(
+              data['datasheet_id']!, _datasheetIdMeta));
     } else if (isInserting) {
-      context.missing(_datasheetIdidMeta);
+      context.missing(_datasheetIdMeta);
     }
     if (data.containsKey('line')) {
       context.handle(
@@ -6691,14 +6689,14 @@ class $TdatasheetunitcompositionTable extends Tdatasheetunitcomposition
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {datasheetId, line};
   @override
   TdatasheetunitcompositionData map(Map<String, dynamic> data,
       {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TdatasheetunitcompositionData(
-      datasheetIdid: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}datasheet_idid'])!,
+      datasheetId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}datasheet_id'])!,
       line: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}line'])!,
       description: attachedDatabase.typeMapping
@@ -6714,17 +6712,17 @@ class $TdatasheetunitcompositionTable extends Tdatasheetunitcomposition
 
 class TdatasheetunitcompositionData extends DataClass
     implements Insertable<TdatasheetunitcompositionData> {
-  final int datasheetIdid;
+  final int datasheetId;
   final int line;
   final String description;
   const TdatasheetunitcompositionData(
-      {required this.datasheetIdid,
+      {required this.datasheetId,
       required this.line,
       required this.description});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['datasheet_idid'] = Variable<int>(datasheetIdid);
+    map['datasheet_id'] = Variable<int>(datasheetId);
     map['line'] = Variable<int>(line);
     map['description'] = Variable<String>(description);
     return map;
@@ -6732,7 +6730,7 @@ class TdatasheetunitcompositionData extends DataClass
 
   TdatasheetunitcompositionCompanion toCompanion(bool nullToAbsent) {
     return TdatasheetunitcompositionCompanion(
-      datasheetIdid: Value(datasheetIdid),
+      datasheetId: Value(datasheetId),
       line: Value(line),
       description: Value(description),
     );
@@ -6742,7 +6740,7 @@ class TdatasheetunitcompositionData extends DataClass
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TdatasheetunitcompositionData(
-      datasheetIdid: serializer.fromJson<int>(json['datasheetIdid']),
+      datasheetId: serializer.fromJson<int>(json['datasheetId']),
       line: serializer.fromJson<int>(json['line']),
       description: serializer.fromJson<String>(json['description']),
     );
@@ -6751,25 +6749,24 @@ class TdatasheetunitcompositionData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'datasheetIdid': serializer.toJson<int>(datasheetIdid),
+      'datasheetId': serializer.toJson<int>(datasheetId),
       'line': serializer.toJson<int>(line),
       'description': serializer.toJson<String>(description),
     };
   }
 
   TdatasheetunitcompositionData copyWith(
-          {int? datasheetIdid, int? line, String? description}) =>
+          {int? datasheetId, int? line, String? description}) =>
       TdatasheetunitcompositionData(
-        datasheetIdid: datasheetIdid ?? this.datasheetIdid,
+        datasheetId: datasheetId ?? this.datasheetId,
         line: line ?? this.line,
         description: description ?? this.description,
       );
   TdatasheetunitcompositionData copyWithCompanion(
       TdatasheetunitcompositionCompanion data) {
     return TdatasheetunitcompositionData(
-      datasheetIdid: data.datasheetIdid.present
-          ? data.datasheetIdid.value
-          : this.datasheetIdid,
+      datasheetId:
+          data.datasheetId.present ? data.datasheetId.value : this.datasheetId,
       line: data.line.present ? data.line.value : this.line,
       description:
           data.description.present ? data.description.value : this.description,
@@ -6779,7 +6776,7 @@ class TdatasheetunitcompositionData extends DataClass
   @override
   String toString() {
     return (StringBuffer('TdatasheetunitcompositionData(')
-          ..write('datasheetIdid: $datasheetIdid, ')
+          ..write('datasheetId: $datasheetId, ')
           ..write('line: $line, ')
           ..write('description: $description')
           ..write(')'))
@@ -6787,44 +6784,44 @@ class TdatasheetunitcompositionData extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(datasheetIdid, line, description);
+  int get hashCode => Object.hash(datasheetId, line, description);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is TdatasheetunitcompositionData &&
-          other.datasheetIdid == this.datasheetIdid &&
+          other.datasheetId == this.datasheetId &&
           other.line == this.line &&
           other.description == this.description);
 }
 
 class TdatasheetunitcompositionCompanion
     extends UpdateCompanion<TdatasheetunitcompositionData> {
-  final Value<int> datasheetIdid;
+  final Value<int> datasheetId;
   final Value<int> line;
   final Value<String> description;
   final Value<int> rowid;
   const TdatasheetunitcompositionCompanion({
-    this.datasheetIdid = const Value.absent(),
+    this.datasheetId = const Value.absent(),
     this.line = const Value.absent(),
     this.description = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TdatasheetunitcompositionCompanion.insert({
-    required int datasheetIdid,
+    required int datasheetId,
     required int line,
     required String description,
     this.rowid = const Value.absent(),
-  })  : datasheetIdid = Value(datasheetIdid),
+  })  : datasheetId = Value(datasheetId),
         line = Value(line),
         description = Value(description);
   static Insertable<TdatasheetunitcompositionData> custom({
-    Expression<int>? datasheetIdid,
+    Expression<int>? datasheetId,
     Expression<int>? line,
     Expression<String>? description,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (datasheetIdid != null) 'datasheet_idid': datasheetIdid,
+      if (datasheetId != null) 'datasheet_id': datasheetId,
       if (line != null) 'line': line,
       if (description != null) 'description': description,
       if (rowid != null) 'rowid': rowid,
@@ -6832,12 +6829,12 @@ class TdatasheetunitcompositionCompanion
   }
 
   TdatasheetunitcompositionCompanion copyWith(
-      {Value<int>? datasheetIdid,
+      {Value<int>? datasheetId,
       Value<int>? line,
       Value<String>? description,
       Value<int>? rowid}) {
     return TdatasheetunitcompositionCompanion(
-      datasheetIdid: datasheetIdid ?? this.datasheetIdid,
+      datasheetId: datasheetId ?? this.datasheetId,
       line: line ?? this.line,
       description: description ?? this.description,
       rowid: rowid ?? this.rowid,
@@ -6847,8 +6844,8 @@ class TdatasheetunitcompositionCompanion
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (datasheetIdid.present) {
-      map['datasheet_idid'] = Variable<int>(datasheetIdid.value);
+    if (datasheetId.present) {
+      map['datasheet_id'] = Variable<int>(datasheetId.value);
     }
     if (line.present) {
       map['line'] = Variable<int>(line.value);
@@ -6865,7 +6862,7 @@ class TdatasheetunitcompositionCompanion
   @override
   String toString() {
     return (StringBuffer('TdatasheetunitcompositionCompanion(')
-          ..write('datasheetIdid: $datasheetIdid, ')
+          ..write('datasheetId: $datasheetId, ')
           ..write('line: $line, ')
           ..write('description: $description, ')
           ..write('rowid: $rowid')
@@ -6892,8 +6889,8 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
   static const VerificationMeta _lineMeta = const VerificationMeta('line');
   @override
   late final GeneratedColumn<int> line = GeneratedColumn<int>(
-      'line', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      'line', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
@@ -6903,8 +6900,8 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
   static const VerificationMeta _costMeta = const VerificationMeta('cost');
   @override
   late final GeneratedColumn<int> cost = GeneratedColumn<int>(
-      'cost', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      'cost', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [datasheetId, line, description, cost];
   @override
@@ -6929,6 +6926,8 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
     if (data.containsKey('line')) {
       context.handle(
           _lineMeta, line.isAcceptableOrUnknown(data['line']!, _lineMeta));
+    } else if (isInserting) {
+      context.missing(_lineMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -6939,14 +6938,12 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
     if (data.containsKey('cost')) {
       context.handle(
           _costMeta, cost.isAcceptableOrUnknown(data['cost']!, _costMeta));
-    } else if (isInserting) {
-      context.missing(_costMeta);
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {datasheetId, line};
   @override
   TdatasheetmodelcostData map(Map<String, dynamic> data,
       {String? tablePrefix}) {
@@ -6955,11 +6952,11 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
       datasheetId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}datasheet_id'])!,
       line: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}line']),
+          .read(DriftSqlType.int, data['${effectivePrefix}line'])!,
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       cost: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}cost'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}cost']),
     );
   }
 
@@ -6972,36 +6969,36 @@ class $TdatasheetmodelcostTable extends Tdatasheetmodelcost
 class TdatasheetmodelcostData extends DataClass
     implements Insertable<TdatasheetmodelcostData> {
   final int datasheetId;
-  final int? line;
+  final int line;
   final String? description;
-  final int cost;
+  final int? cost;
   const TdatasheetmodelcostData(
       {required this.datasheetId,
-      this.line,
+      required this.line,
       this.description,
-      required this.cost});
+      this.cost});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['datasheet_id'] = Variable<int>(datasheetId);
-    if (!nullToAbsent || line != null) {
-      map['line'] = Variable<int>(line);
-    }
+    map['line'] = Variable<int>(line);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
-    map['cost'] = Variable<int>(cost);
+    if (!nullToAbsent || cost != null) {
+      map['cost'] = Variable<int>(cost);
+    }
     return map;
   }
 
   TdatasheetmodelcostCompanion toCompanion(bool nullToAbsent) {
     return TdatasheetmodelcostCompanion(
       datasheetId: Value(datasheetId),
-      line: line == null && nullToAbsent ? const Value.absent() : Value(line),
+      line: Value(line),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
-      cost: Value(cost),
+      cost: cost == null && nullToAbsent ? const Value.absent() : Value(cost),
     );
   }
 
@@ -7010,9 +7007,9 @@ class TdatasheetmodelcostData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TdatasheetmodelcostData(
       datasheetId: serializer.fromJson<int>(json['datasheetId']),
-      line: serializer.fromJson<int?>(json['line']),
+      line: serializer.fromJson<int>(json['line']),
       description: serializer.fromJson<String?>(json['description']),
-      cost: serializer.fromJson<int>(json['cost']),
+      cost: serializer.fromJson<int?>(json['cost']),
     );
   }
   @override
@@ -7020,22 +7017,22 @@ class TdatasheetmodelcostData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'datasheetId': serializer.toJson<int>(datasheetId),
-      'line': serializer.toJson<int?>(line),
+      'line': serializer.toJson<int>(line),
       'description': serializer.toJson<String?>(description),
-      'cost': serializer.toJson<int>(cost),
+      'cost': serializer.toJson<int?>(cost),
     };
   }
 
   TdatasheetmodelcostData copyWith(
           {int? datasheetId,
-          Value<int?> line = const Value.absent(),
+          int? line,
           Value<String?> description = const Value.absent(),
-          int? cost}) =>
+          Value<int?> cost = const Value.absent()}) =>
       TdatasheetmodelcostData(
         datasheetId: datasheetId ?? this.datasheetId,
-        line: line.present ? line.value : this.line,
+        line: line ?? this.line,
         description: description.present ? description.value : this.description,
-        cost: cost ?? this.cost,
+        cost: cost.present ? cost.value : this.cost,
       );
   TdatasheetmodelcostData copyWithCompanion(TdatasheetmodelcostCompanion data) {
     return TdatasheetmodelcostData(
@@ -7074,9 +7071,9 @@ class TdatasheetmodelcostData extends DataClass
 class TdatasheetmodelcostCompanion
     extends UpdateCompanion<TdatasheetmodelcostData> {
   final Value<int> datasheetId;
-  final Value<int?> line;
+  final Value<int> line;
   final Value<String?> description;
-  final Value<int> cost;
+  final Value<int?> cost;
   final Value<int> rowid;
   const TdatasheetmodelcostCompanion({
     this.datasheetId = const Value.absent(),
@@ -7087,12 +7084,12 @@ class TdatasheetmodelcostCompanion
   });
   TdatasheetmodelcostCompanion.insert({
     required int datasheetId,
-    this.line = const Value.absent(),
+    required int line,
     this.description = const Value.absent(),
-    required int cost,
+    this.cost = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : datasheetId = Value(datasheetId),
-        cost = Value(cost);
+        line = Value(line);
   static Insertable<TdatasheetmodelcostData> custom({
     Expression<int>? datasheetId,
     Expression<int>? line,
@@ -7111,9 +7108,9 @@ class TdatasheetmodelcostCompanion
 
   TdatasheetmodelcostCompanion copyWith(
       {Value<int>? datasheetId,
-      Value<int?>? line,
+      Value<int>? line,
       Value<String?>? description,
-      Value<int>? cost,
+      Value<int?>? cost,
       Value<int>? rowid}) {
     return TdatasheetmodelcostCompanion(
       datasheetId: datasheetId ?? this.datasheetId,
@@ -8231,13 +8228,13 @@ final class $$TdatasheetTableReferences
           _$AppDatabase db) =>
       MultiTypedResultKey.fromTable(db.tdatasheetunitcomposition,
           aliasName: $_aliasNameGenerator(
-              db.tdatasheet.id, db.tdatasheetunitcomposition.datasheetIdid));
+              db.tdatasheet.id, db.tdatasheetunitcomposition.datasheetId));
 
   $$TdatasheetunitcompositionTableProcessedTableManager
       get tdatasheetunitcompositionRefs {
     final manager = $$TdatasheetunitcompositionTableTableManager(
             $_db, $_db.tdatasheetunitcomposition)
-        .filter((f) => f.datasheetIdid.id.sqlEquals($_itemColumn<int>('id')!));
+        .filter((f) => f.datasheetId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult
         .readTableOrNull(_tdatasheetunitcompositionRefsTable($_db));
@@ -8511,7 +8508,7 @@ class $$TdatasheetTableFilterComposer
             composer: this,
             getCurrentColumn: (t) => t.id,
             referencedTable: $db.tdatasheetunitcomposition,
-            getReferencedColumn: (t) => t.datasheetIdid,
+            getReferencedColumn: (t) => t.datasheetId,
             builder: (joinBuilder,
                     {$addJoinBuilderToRootComposer,
                     $removeJoinBuilderFromRootComposer}) =>
@@ -8886,7 +8883,7 @@ class $$TdatasheetTableAnnotationComposer
             composer: this,
             getCurrentColumn: (t) => t.id,
             referencedTable: $db.tdatasheetunitcomposition,
-            getReferencedColumn: (t) => t.datasheetIdid,
+            getReferencedColumn: (t) => t.datasheetId,
             builder: (joinBuilder,
                     {$addJoinBuilderToRootComposer,
                     $removeJoinBuilderFromRootComposer}) =>
@@ -9194,7 +9191,7 @@ class $$TdatasheetTableTableManager extends RootTableManager<
                                 .tdatasheetunitcompositionRefs,
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
-                                .where((e) => e.datasheetIdid == item.id),
+                                .where((e) => e.datasheetId == item.id),
                         typedResults: items),
                   if (tdatasheetmodelcostRefs)
                     await $_getPrefetchedData<TdatasheetData, $TdatasheetTable,
@@ -11842,7 +11839,7 @@ typedef $$TdatasheetwargearTableCreateCompanionBuilder
     = TdatasheetwargearCompanion Function({
   required int datasheetId,
   Value<int?> line,
-  Value<int?> lineInWargear,
+  required int lineInWargear,
   required String dice,
   Value<String?> name,
   Value<String?> description,
@@ -11859,7 +11856,7 @@ typedef $$TdatasheetwargearTableUpdateCompanionBuilder
     = TdatasheetwargearCompanion Function({
   Value<int> datasheetId,
   Value<int?> line,
-  Value<int?> lineInWargear,
+  Value<int> lineInWargear,
   Value<String> dice,
   Value<String?> name,
   Value<String?> description,
@@ -12124,7 +12121,7 @@ class $$TdatasheetwargearTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> datasheetId = const Value.absent(),
             Value<int?> line = const Value.absent(),
-            Value<int?> lineInWargear = const Value.absent(),
+            Value<int> lineInWargear = const Value.absent(),
             Value<String> dice = const Value.absent(),
             Value<String?> name = const Value.absent(),
             Value<String?> description = const Value.absent(),
@@ -12156,7 +12153,7 @@ class $$TdatasheetwargearTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             required int datasheetId,
             Value<int?> line = const Value.absent(),
-            Value<int?> lineInWargear = const Value.absent(),
+            required int lineInWargear,
             required String dice,
             Value<String?> name = const Value.absent(),
             Value<String?> description = const Value.absent(),
@@ -14514,14 +14511,14 @@ typedef $$TdatasheetdetachmentabilityTableProcessedTableManager = ProcessedTable
     PrefetchHooks Function({bool datasheetId, bool detachmentAbilityId})>;
 typedef $$TdatasheetunitcompositionTableCreateCompanionBuilder
     = TdatasheetunitcompositionCompanion Function({
-  required int datasheetIdid,
+  required int datasheetId,
   required int line,
   required String description,
   Value<int> rowid,
 });
 typedef $$TdatasheetunitcompositionTableUpdateCompanionBuilder
     = TdatasheetunitcompositionCompanion Function({
-  Value<int> datasheetIdid,
+  Value<int> datasheetId,
   Value<int> line,
   Value<String> description,
   Value<int> rowid,
@@ -14534,16 +14531,16 @@ final class $$TdatasheetunitcompositionTableReferences extends BaseReferences<
   $$TdatasheetunitcompositionTableReferences(
       super.$_db, super.$_table, super.$_typedResult);
 
-  static $TdatasheetTable _datasheetIdidTable(_$AppDatabase db) =>
+  static $TdatasheetTable _datasheetIdTable(_$AppDatabase db) =>
       db.tdatasheet.createAlias($_aliasNameGenerator(
-          db.tdatasheetunitcomposition.datasheetIdid, db.tdatasheet.id));
+          db.tdatasheetunitcomposition.datasheetId, db.tdatasheet.id));
 
-  $$TdatasheetTableProcessedTableManager get datasheetIdid {
-    final $_column = $_itemColumn<int>('datasheet_idid')!;
+  $$TdatasheetTableProcessedTableManager get datasheetId {
+    final $_column = $_itemColumn<int>('datasheet_id')!;
 
     final manager = $$TdatasheetTableTableManager($_db, $_db.tdatasheet)
         .filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_datasheetIdidTable($_db));
+    final item = $_typedResult.readTableOrNull(_datasheetIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: [item]));
@@ -14565,10 +14562,10 @@ class $$TdatasheetunitcompositionTableFilterComposer
   ColumnFilters<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnFilters(column));
 
-  $$TdatasheetTableFilterComposer get datasheetIdid {
+  $$TdatasheetTableFilterComposer get datasheetId {
     final $$TdatasheetTableFilterComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.datasheetIdid,
+        getCurrentColumn: (t) => t.datasheetId,
         referencedTable: $db.tdatasheet,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
@@ -14601,10 +14598,10 @@ class $$TdatasheetunitcompositionTableOrderingComposer
   ColumnOrderings<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnOrderings(column));
 
-  $$TdatasheetTableOrderingComposer get datasheetIdid {
+  $$TdatasheetTableOrderingComposer get datasheetId {
     final $$TdatasheetTableOrderingComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.datasheetIdid,
+        getCurrentColumn: (t) => t.datasheetId,
         referencedTable: $db.tdatasheet,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
@@ -14637,10 +14634,10 @@ class $$TdatasheetunitcompositionTableAnnotationComposer
   GeneratedColumn<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => column);
 
-  $$TdatasheetTableAnnotationComposer get datasheetIdid {
+  $$TdatasheetTableAnnotationComposer get datasheetId {
     final $$TdatasheetTableAnnotationComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.datasheetIdid,
+        getCurrentColumn: (t) => t.datasheetId,
         referencedTable: $db.tdatasheet,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
@@ -14669,7 +14666,7 @@ class $$TdatasheetunitcompositionTableTableManager extends RootTableManager<
     $$TdatasheetunitcompositionTableUpdateCompanionBuilder,
     (TdatasheetunitcompositionData, $$TdatasheetunitcompositionTableReferences),
     TdatasheetunitcompositionData,
-    PrefetchHooks Function({bool datasheetIdid})> {
+    PrefetchHooks Function({bool datasheetId})> {
   $$TdatasheetunitcompositionTableTableManager(
       _$AppDatabase db, $TdatasheetunitcompositionTable table)
       : super(TableManagerState(
@@ -14685,25 +14682,25 @@ class $$TdatasheetunitcompositionTableTableManager extends RootTableManager<
               $$TdatasheetunitcompositionTableAnnotationComposer(
                   $db: db, $table: table),
           updateCompanionCallback: ({
-            Value<int> datasheetIdid = const Value.absent(),
+            Value<int> datasheetId = const Value.absent(),
             Value<int> line = const Value.absent(),
             Value<String> description = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TdatasheetunitcompositionCompanion(
-            datasheetIdid: datasheetIdid,
+            datasheetId: datasheetId,
             line: line,
             description: description,
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            required int datasheetIdid,
+            required int datasheetId,
             required int line,
             required String description,
             Value<int> rowid = const Value.absent(),
           }) =>
               TdatasheetunitcompositionCompanion.insert(
-            datasheetIdid: datasheetIdid,
+            datasheetId: datasheetId,
             line: line,
             description: description,
             rowid: rowid,
@@ -14714,7 +14711,7 @@ class $$TdatasheetunitcompositionTableTableManager extends RootTableManager<
                     $$TdatasheetunitcompositionTableReferences(db, table, e)
                   ))
               .toList(),
-          prefetchHooksCallback: ({datasheetIdid = false}) {
+          prefetchHooksCallback: ({datasheetId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -14731,14 +14728,14 @@ class $$TdatasheetunitcompositionTableTableManager extends RootTableManager<
                       dynamic,
                       dynamic,
                       dynamic>>(state) {
-                if (datasheetIdid) {
+                if (datasheetId) {
                   state = state.withJoin(
                     currentTable: table,
-                    currentColumn: table.datasheetIdid,
+                    currentColumn: table.datasheetId,
                     referencedTable: $$TdatasheetunitcompositionTableReferences
-                        ._datasheetIdidTable(db),
+                        ._datasheetIdTable(db),
                     referencedColumn: $$TdatasheetunitcompositionTableReferences
-                        ._datasheetIdidTable(db)
+                        ._datasheetIdTable(db)
                         .id,
                   ) as T;
                 }
@@ -14768,21 +14765,21 @@ typedef $$TdatasheetunitcompositionTableProcessedTableManager
           $$TdatasheetunitcompositionTableReferences
         ),
         TdatasheetunitcompositionData,
-        PrefetchHooks Function({bool datasheetIdid})>;
+        PrefetchHooks Function({bool datasheetId})>;
 typedef $$TdatasheetmodelcostTableCreateCompanionBuilder
     = TdatasheetmodelcostCompanion Function({
   required int datasheetId,
-  Value<int?> line,
+  required int line,
   Value<String?> description,
-  required int cost,
+  Value<int?> cost,
   Value<int> rowid,
 });
 typedef $$TdatasheetmodelcostTableUpdateCompanionBuilder
     = TdatasheetmodelcostCompanion Function({
   Value<int> datasheetId,
-  Value<int?> line,
+  Value<int> line,
   Value<String?> description,
-  Value<int> cost,
+  Value<int?> cost,
   Value<int> rowid,
 });
 
@@ -14951,9 +14948,9 @@ class $$TdatasheetmodelcostTableTableManager extends RootTableManager<
                   $db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> datasheetId = const Value.absent(),
-            Value<int?> line = const Value.absent(),
+            Value<int> line = const Value.absent(),
             Value<String?> description = const Value.absent(),
-            Value<int> cost = const Value.absent(),
+            Value<int?> cost = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TdatasheetmodelcostCompanion(
@@ -14965,9 +14962,9 @@ class $$TdatasheetmodelcostTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             required int datasheetId,
-            Value<int?> line = const Value.absent(),
+            required int line,
             Value<String?> description = const Value.absent(),
-            required int cost,
+            Value<int?> cost = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TdatasheetmodelcostCompanion.insert(

@@ -6,4 +6,7 @@ class Tdatasheetoption extends Table {
   IntColumn get line => integer()();
   TextColumn get button => text().nullable()();
   TextColumn get description => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {datasheetId, line};
 }
