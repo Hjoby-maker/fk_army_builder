@@ -1,9 +1,6 @@
 //import 'package:drift/drift.dart';
 //import 'dart:ffi';
 
-import 'package:fk_army_builder/database/daos/datasheet_ability_dao.dart';
-import 'package:fk_army_builder/database/daos/datasheet_model_dao.dart';
-import 'package:fk_army_builder/database/daos/enhancement_dao.dart';
 import 'package:fk_army_builder/database/daos/index_dao.dart';
 import 'package:fk_army_builder/database/database.dart';
 import 'package:fk_army_builder/database/converters/model_to_companion.dart';
@@ -21,6 +18,20 @@ class DatabaseService {
   late DatasheetAbilityDao _datasheetAbilityDao;
   late DatasheetModelDao _datasheetModelDao;
   late EnhancementDao _enhancementDao;
+  late DetachmentDao _detachmentDao;
+  late StratagemDao _stratagemDao;
+  late SourceDao _sourceDao;
+  late LastUpdateDao _lastUpdateDao;
+  late DatasheetWargearDao _datasheetWargearDao;
+  late DatasheetKeywordDao _datasheetKeywordDao;
+  late DatasheetOptionDao _datasheetOptionDao;
+  late DatasheetLeaderDao _datasheetLeaderDao;
+  late DatasheetStratagemDao _datasheetStratagemDao;
+  late DatasheetEnhancementDao _datasheetEnhancementDao;
+  late DatasheetDetachmentAbilityDao _datasheetDetachmentAbilityDao;
+  late DatasheetUnitCompositionDao _datasheetUnitCompositionDao;
+  late DatasheetModelCostDao _datasheetModelCostDao;
+  late DetachmentAbilityDao _detachmentAbilityDao;
 
   Future<void> initialize() async {
     _database = AppDatabase();
@@ -30,6 +41,20 @@ class DatabaseService {
     _datasheetAbilityDao = DatasheetAbilityDao(_database);
     _datasheetModelDao = DatasheetModelDao(_database);
     _enhancementDao = EnhancementDao(_database);
+    _detachmentDao = DetachmentDao(_database);;
+    _stratagemDao = StratagemDao(_database);;
+    _sourceDao = SourceDao(_database);;
+    _lastUpdateDao = LastUpdateDao(_database);;
+    _datasheetWargearDao = DatasheetWargearDao(_database);;
+    _datasheetKeywordDao = DatasheetKeywordDao(_database);;
+    _datasheetOptionDao = DatasheetOptionDao(_database);;
+    _datasheetLeaderDao = DatasheetLeaderDao(_database);;
+    _datasheetStratagemDao = DatasheetStratagemDao(_database);;
+   _datasheetEnhancementDao = DatasheetEnhancementDao(_database);;
+    _datasheetDetachmentAbilityDao = DatasheetDetachmentAbilityDao(_database);;
+    _datasheetUnitCompositionDao = DatasheetUnitCompositionDao(_database);;
+    _datasheetModelCostDao = DatasheetModelCostDao(_database);
+    _detachmentAbilityDao = DetachmentAbilityDao(_database);;
   }
 
   // --- Faction methods ---

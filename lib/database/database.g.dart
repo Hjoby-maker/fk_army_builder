@@ -2340,16 +2340,13 @@ class $TstratagemTable extends Tstratagem
       const VerificationMeta('factionId');
   @override
   late final GeneratedColumn<String> factionId = GeneratedColumn<String>(
-      'faction_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'faction_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 200),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      'name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -2391,9 +2388,9 @@ class $TstratagemTable extends Tstratagem
       const VerificationMeta('detachmentId');
   @override
   late final GeneratedColumn<int> detachmentId = GeneratedColumn<int>(
-      'detachment_id', aliasedName, false,
+      'detachment_id', aliasedName, true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES tdetachment (id)'));
   static const VerificationMeta _descriptionMeta =
@@ -2429,14 +2426,10 @@ class $TstratagemTable extends Tstratagem
     if (data.containsKey('faction_id')) {
       context.handle(_factionIdMeta,
           factionId.isAcceptableOrUnknown(data['faction_id']!, _factionIdMeta));
-    } else if (isInserting) {
-      context.missing(_factionIdMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
-    } else if (isInserting) {
-      context.missing(_nameMeta);
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
@@ -2474,8 +2467,6 @@ class $TstratagemTable extends Tstratagem
           _detachmentIdMeta,
           detachmentId.isAcceptableOrUnknown(
               data['detachment_id']!, _detachmentIdMeta));
-    } else if (isInserting) {
-      context.missing(_detachmentIdMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -2493,9 +2484,9 @@ class $TstratagemTable extends Tstratagem
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TstratagemData(
       factionId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}faction_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}faction_id']),
       name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}name']),
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       type: attachedDatabase.typeMapping
@@ -2511,7 +2502,7 @@ class $TstratagemTable extends Tstratagem
       detachment: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}detachment']),
       detachmentId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}detachment_id'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}detachment_id']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
     );
@@ -2524,8 +2515,8 @@ class $TstratagemTable extends Tstratagem
 }
 
 class TstratagemData extends DataClass implements Insertable<TstratagemData> {
-  final String factionId;
-  final String name;
+  final String? factionId;
+  final String? name;
   final int id;
   final String? type;
   final int? commandPointCost;
@@ -2533,11 +2524,11 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
   final String? turn;
   final String? phase;
   final String? detachment;
-  final int detachmentId;
+  final int? detachmentId;
   final String? description;
   const TstratagemData(
-      {required this.factionId,
-      required this.name,
+      {this.factionId,
+      this.name,
       required this.id,
       this.type,
       this.commandPointCost,
@@ -2545,13 +2536,17 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
       this.turn,
       this.phase,
       this.detachment,
-      required this.detachmentId,
+      this.detachmentId,
       this.description});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['faction_id'] = Variable<String>(factionId);
-    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || factionId != null) {
+      map['faction_id'] = Variable<String>(factionId);
+    }
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
     map['id'] = Variable<int>(id);
     if (!nullToAbsent || type != null) {
       map['type'] = Variable<String>(type);
@@ -2571,7 +2566,9 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
     if (!nullToAbsent || detachment != null) {
       map['detachment'] = Variable<String>(detachment);
     }
-    map['detachment_id'] = Variable<int>(detachmentId);
+    if (!nullToAbsent || detachmentId != null) {
+      map['detachment_id'] = Variable<int>(detachmentId);
+    }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -2580,8 +2577,10 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
 
   TstratagemCompanion toCompanion(bool nullToAbsent) {
     return TstratagemCompanion(
-      factionId: Value(factionId),
-      name: Value(name),
+      factionId: factionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(factionId),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
       id: Value(id),
       type: type == null && nullToAbsent ? const Value.absent() : Value(type),
       commandPointCost: commandPointCost == null && nullToAbsent
@@ -2595,7 +2594,9 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
       detachment: detachment == null && nullToAbsent
           ? const Value.absent()
           : Value(detachment),
-      detachmentId: Value(detachmentId),
+      detachmentId: detachmentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(detachmentId),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -2606,8 +2607,8 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TstratagemData(
-      factionId: serializer.fromJson<String>(json['factionId']),
-      name: serializer.fromJson<String>(json['name']),
+      factionId: serializer.fromJson<String?>(json['factionId']),
+      name: serializer.fromJson<String?>(json['name']),
       id: serializer.fromJson<int>(json['id']),
       type: serializer.fromJson<String?>(json['type']),
       commandPointCost: serializer.fromJson<int?>(json['commandPointCost']),
@@ -2615,7 +2616,7 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
       turn: serializer.fromJson<String?>(json['turn']),
       phase: serializer.fromJson<String?>(json['phase']),
       detachment: serializer.fromJson<String?>(json['detachment']),
-      detachmentId: serializer.fromJson<int>(json['detachmentId']),
+      detachmentId: serializer.fromJson<int?>(json['detachmentId']),
       description: serializer.fromJson<String?>(json['description']),
     );
   }
@@ -2623,8 +2624,8 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'factionId': serializer.toJson<String>(factionId),
-      'name': serializer.toJson<String>(name),
+      'factionId': serializer.toJson<String?>(factionId),
+      'name': serializer.toJson<String?>(name),
       'id': serializer.toJson<int>(id),
       'type': serializer.toJson<String?>(type),
       'commandPointCost': serializer.toJson<int?>(commandPointCost),
@@ -2632,14 +2633,14 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
       'turn': serializer.toJson<String?>(turn),
       'phase': serializer.toJson<String?>(phase),
       'detachment': serializer.toJson<String?>(detachment),
-      'detachmentId': serializer.toJson<int>(detachmentId),
+      'detachmentId': serializer.toJson<int?>(detachmentId),
       'description': serializer.toJson<String?>(description),
     };
   }
 
   TstratagemData copyWith(
-          {String? factionId,
-          String? name,
+          {Value<String?> factionId = const Value.absent(),
+          Value<String?> name = const Value.absent(),
           int? id,
           Value<String?> type = const Value.absent(),
           Value<int?> commandPointCost = const Value.absent(),
@@ -2647,11 +2648,11 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
           Value<String?> turn = const Value.absent(),
           Value<String?> phase = const Value.absent(),
           Value<String?> detachment = const Value.absent(),
-          int? detachmentId,
+          Value<int?> detachmentId = const Value.absent(),
           Value<String?> description = const Value.absent()}) =>
       TstratagemData(
-        factionId: factionId ?? this.factionId,
-        name: name ?? this.name,
+        factionId: factionId.present ? factionId.value : this.factionId,
+        name: name.present ? name.value : this.name,
         id: id ?? this.id,
         type: type.present ? type.value : this.type,
         commandPointCost: commandPointCost.present
@@ -2661,7 +2662,8 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
         turn: turn.present ? turn.value : this.turn,
         phase: phase.present ? phase.value : this.phase,
         detachment: detachment.present ? detachment.value : this.detachment,
-        detachmentId: detachmentId ?? this.detachmentId,
+        detachmentId:
+            detachmentId.present ? detachmentId.value : this.detachmentId,
         description: description.present ? description.value : this.description,
       );
   TstratagemData copyWithCompanion(TstratagemCompanion data) {
@@ -2725,8 +2727,8 @@ class TstratagemData extends DataClass implements Insertable<TstratagemData> {
 }
 
 class TstratagemCompanion extends UpdateCompanion<TstratagemData> {
-  final Value<String> factionId;
-  final Value<String> name;
+  final Value<String?> factionId;
+  final Value<String?> name;
   final Value<int> id;
   final Value<String?> type;
   final Value<int?> commandPointCost;
@@ -2734,7 +2736,7 @@ class TstratagemCompanion extends UpdateCompanion<TstratagemData> {
   final Value<String?> turn;
   final Value<String?> phase;
   final Value<String?> detachment;
-  final Value<int> detachmentId;
+  final Value<int?> detachmentId;
   final Value<String?> description;
   const TstratagemCompanion({
     this.factionId = const Value.absent(),
@@ -2750,8 +2752,8 @@ class TstratagemCompanion extends UpdateCompanion<TstratagemData> {
     this.description = const Value.absent(),
   });
   TstratagemCompanion.insert({
-    required String factionId,
-    required String name,
+    this.factionId = const Value.absent(),
+    this.name = const Value.absent(),
     this.id = const Value.absent(),
     this.type = const Value.absent(),
     this.commandPointCost = const Value.absent(),
@@ -2759,11 +2761,9 @@ class TstratagemCompanion extends UpdateCompanion<TstratagemData> {
     this.turn = const Value.absent(),
     this.phase = const Value.absent(),
     this.detachment = const Value.absent(),
-    required int detachmentId,
+    this.detachmentId = const Value.absent(),
     this.description = const Value.absent(),
-  })  : factionId = Value(factionId),
-        name = Value(name),
-        detachmentId = Value(detachmentId);
+  });
   static Insertable<TstratagemData> custom({
     Expression<String>? factionId,
     Expression<String>? name,
@@ -2793,8 +2793,8 @@ class TstratagemCompanion extends UpdateCompanion<TstratagemData> {
   }
 
   TstratagemCompanion copyWith(
-      {Value<String>? factionId,
-      Value<String>? name,
+      {Value<String?>? factionId,
+      Value<String?>? name,
       Value<int>? id,
       Value<String?>? type,
       Value<int?>? commandPointCost,
@@ -2802,7 +2802,7 @@ class TstratagemCompanion extends UpdateCompanion<TstratagemData> {
       Value<String?>? turn,
       Value<String?>? phase,
       Value<String?>? detachment,
-      Value<int>? detachmentId,
+      Value<int?>? detachmentId,
       Value<String?>? description}) {
     return TstratagemCompanion(
       factionId: factionId ?? this.factionId,
@@ -4176,11 +4176,8 @@ class $TdatasheetwargearTable extends Tdatasheetwargear
   static const VerificationMeta _diceMeta = const VerificationMeta('dice');
   @override
   late final GeneratedColumn<String> dice = GeneratedColumn<String>(
-      'dice', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 200),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      'dice', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -4281,8 +4278,6 @@ class $TdatasheetwargearTable extends Tdatasheetwargear
     if (data.containsKey('dice')) {
       context.handle(
           _diceMeta, dice.isAcceptableOrUnknown(data['dice']!, _diceMeta));
-    } else if (isInserting) {
-      context.missing(_diceMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -4342,7 +4337,7 @@ class $TdatasheetwargearTable extends Tdatasheetwargear
       lineInWargear: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}line_in_wargear'])!,
       dice: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}dice'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}dice']),
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name']),
       description: attachedDatabase.typeMapping
@@ -4375,7 +4370,7 @@ class TdatasheetwargearData extends DataClass
   final int datasheetId;
   final int? line;
   final int lineInWargear;
-  final String dice;
+  final String? dice;
   final String? name;
   final String? description;
   final int? range;
@@ -4389,7 +4384,7 @@ class TdatasheetwargearData extends DataClass
       {required this.datasheetId,
       this.line,
       required this.lineInWargear,
-      required this.dice,
+      this.dice,
       this.name,
       this.description,
       this.range,
@@ -4407,7 +4402,9 @@ class TdatasheetwargearData extends DataClass
       map['line'] = Variable<int>(line);
     }
     map['line_in_wargear'] = Variable<int>(lineInWargear);
-    map['dice'] = Variable<String>(dice);
+    if (!nullToAbsent || dice != null) {
+      map['dice'] = Variable<String>(dice);
+    }
     if (!nullToAbsent || name != null) {
       map['name'] = Variable<String>(name);
     }
@@ -4443,7 +4440,7 @@ class TdatasheetwargearData extends DataClass
       datasheetId: Value(datasheetId),
       line: line == null && nullToAbsent ? const Value.absent() : Value(line),
       lineInWargear: Value(lineInWargear),
-      dice: Value(dice),
+      dice: dice == null && nullToAbsent ? const Value.absent() : Value(dice),
       name: name == null && nullToAbsent ? const Value.absent() : Value(name),
       description: description == null && nullToAbsent
           ? const Value.absent()
@@ -4475,7 +4472,7 @@ class TdatasheetwargearData extends DataClass
       datasheetId: serializer.fromJson<int>(json['datasheetId']),
       line: serializer.fromJson<int?>(json['line']),
       lineInWargear: serializer.fromJson<int>(json['lineInWargear']),
-      dice: serializer.fromJson<String>(json['dice']),
+      dice: serializer.fromJson<String?>(json['dice']),
       name: serializer.fromJson<String?>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
       range: serializer.fromJson<int?>(json['range']),
@@ -4494,7 +4491,7 @@ class TdatasheetwargearData extends DataClass
       'datasheetId': serializer.toJson<int>(datasheetId),
       'line': serializer.toJson<int?>(line),
       'lineInWargear': serializer.toJson<int>(lineInWargear),
-      'dice': serializer.toJson<String>(dice),
+      'dice': serializer.toJson<String?>(dice),
       'name': serializer.toJson<String?>(name),
       'description': serializer.toJson<String?>(description),
       'range': serializer.toJson<int?>(range),
@@ -4511,7 +4508,7 @@ class TdatasheetwargearData extends DataClass
           {int? datasheetId,
           Value<int?> line = const Value.absent(),
           int? lineInWargear,
-          String? dice,
+          Value<String?> dice = const Value.absent(),
           Value<String?> name = const Value.absent(),
           Value<String?> description = const Value.absent(),
           Value<int?> range = const Value.absent(),
@@ -4525,7 +4522,7 @@ class TdatasheetwargearData extends DataClass
         datasheetId: datasheetId ?? this.datasheetId,
         line: line.present ? line.value : this.line,
         lineInWargear: lineInWargear ?? this.lineInWargear,
-        dice: dice ?? this.dice,
+        dice: dice.present ? dice.value : this.dice,
         name: name.present ? name.value : this.name,
         description: description.present ? description.value : this.description,
         range: range.present ? range.value : this.range,
@@ -4624,7 +4621,7 @@ class TdatasheetwargearCompanion
   final Value<int> datasheetId;
   final Value<int?> line;
   final Value<int> lineInWargear;
-  final Value<String> dice;
+  final Value<String?> dice;
   final Value<String?> name;
   final Value<String?> description;
   final Value<int?> range;
@@ -4655,7 +4652,7 @@ class TdatasheetwargearCompanion
     required int datasheetId,
     this.line = const Value.absent(),
     required int lineInWargear,
-    required String dice,
+    this.dice = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
     this.range = const Value.absent(),
@@ -4667,8 +4664,7 @@ class TdatasheetwargearCompanion
     this.damage = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : datasheetId = Value(datasheetId),
-        lineInWargear = Value(lineInWargear),
-        dice = Value(dice);
+        lineInWargear = Value(lineInWargear);
   static Insertable<TdatasheetwargearData> custom({
     Expression<int>? datasheetId,
     Expression<int>? line,
@@ -4707,7 +4703,7 @@ class TdatasheetwargearCompanion
       {Value<int>? datasheetId,
       Value<int?>? line,
       Value<int>? lineInWargear,
-      Value<String>? dice,
+      Value<String?>? dice,
       Value<String?>? name,
       Value<String?>? description,
       Value<int?>? range,
@@ -6057,9 +6053,9 @@ class $TdetachmentabilityTable extends Tdetachmentability
       const VerificationMeta('detachmentId');
   @override
   late final GeneratedColumn<int> detachmentId = GeneratedColumn<int>(
-      'detachment_id', aliasedName, false,
+      'detachment_id', aliasedName, true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES tdetachment (id)'));
   @override
@@ -6112,8 +6108,6 @@ class $TdetachmentabilityTable extends Tdetachmentability
           _detachmentIdMeta,
           detachmentId.isAcceptableOrUnknown(
               data['detachment_id']!, _detachmentIdMeta));
-    } else if (isInserting) {
-      context.missing(_detachmentIdMeta);
     }
     return context;
   }
@@ -6137,7 +6131,7 @@ class $TdetachmentabilityTable extends Tdetachmentability
       detachment: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}detachment']),
       detachmentId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}detachment_id'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}detachment_id']),
     );
   }
 
@@ -6155,7 +6149,7 @@ class TdetachmentabilityData extends DataClass
   final String? legend;
   final String? description;
   final String? detachment;
-  final int detachmentId;
+  final int? detachmentId;
   const TdetachmentabilityData(
       {required this.id,
       required this.factionId,
@@ -6163,7 +6157,7 @@ class TdetachmentabilityData extends DataClass
       this.legend,
       this.description,
       this.detachment,
-      required this.detachmentId});
+      this.detachmentId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -6179,7 +6173,9 @@ class TdetachmentabilityData extends DataClass
     if (!nullToAbsent || detachment != null) {
       map['detachment'] = Variable<String>(detachment);
     }
-    map['detachment_id'] = Variable<int>(detachmentId);
+    if (!nullToAbsent || detachmentId != null) {
+      map['detachment_id'] = Variable<int>(detachmentId);
+    }
     return map;
   }
 
@@ -6196,7 +6192,9 @@ class TdetachmentabilityData extends DataClass
       detachment: detachment == null && nullToAbsent
           ? const Value.absent()
           : Value(detachment),
-      detachmentId: Value(detachmentId),
+      detachmentId: detachmentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(detachmentId),
     );
   }
 
@@ -6210,7 +6208,7 @@ class TdetachmentabilityData extends DataClass
       legend: serializer.fromJson<String?>(json['legend']),
       description: serializer.fromJson<String?>(json['description']),
       detachment: serializer.fromJson<String?>(json['detachment']),
-      detachmentId: serializer.fromJson<int>(json['detachmentId']),
+      detachmentId: serializer.fromJson<int?>(json['detachmentId']),
     );
   }
   @override
@@ -6223,7 +6221,7 @@ class TdetachmentabilityData extends DataClass
       'legend': serializer.toJson<String?>(legend),
       'description': serializer.toJson<String?>(description),
       'detachment': serializer.toJson<String?>(detachment),
-      'detachmentId': serializer.toJson<int>(detachmentId),
+      'detachmentId': serializer.toJson<int?>(detachmentId),
     };
   }
 
@@ -6234,7 +6232,7 @@ class TdetachmentabilityData extends DataClass
           Value<String?> legend = const Value.absent(),
           Value<String?> description = const Value.absent(),
           Value<String?> detachment = const Value.absent(),
-          int? detachmentId}) =>
+          Value<int?> detachmentId = const Value.absent()}) =>
       TdetachmentabilityData(
         id: id ?? this.id,
         factionId: factionId ?? this.factionId,
@@ -6242,7 +6240,8 @@ class TdetachmentabilityData extends DataClass
         legend: legend.present ? legend.value : this.legend,
         description: description.present ? description.value : this.description,
         detachment: detachment.present ? detachment.value : this.detachment,
-        detachmentId: detachmentId ?? this.detachmentId,
+        detachmentId:
+            detachmentId.present ? detachmentId.value : this.detachmentId,
       );
   TdetachmentabilityData copyWithCompanion(TdetachmentabilityCompanion data) {
     return TdetachmentabilityData(
@@ -6298,7 +6297,7 @@ class TdetachmentabilityCompanion
   final Value<String?> legend;
   final Value<String?> description;
   final Value<String?> detachment;
-  final Value<int> detachmentId;
+  final Value<int?> detachmentId;
   const TdetachmentabilityCompanion({
     this.id = const Value.absent(),
     this.factionId = const Value.absent(),
@@ -6315,10 +6314,9 @@ class TdetachmentabilityCompanion
     this.legend = const Value.absent(),
     this.description = const Value.absent(),
     this.detachment = const Value.absent(),
-    required int detachmentId,
+    this.detachmentId = const Value.absent(),
   })  : factionId = Value(factionId),
-        name = Value(name),
-        detachmentId = Value(detachmentId);
+        name = Value(name);
   static Insertable<TdetachmentabilityData> custom({
     Expression<int>? id,
     Expression<String>? factionId,
@@ -6346,7 +6344,7 @@ class TdetachmentabilityCompanion
       Value<String?>? legend,
       Value<String?>? description,
       Value<String?>? detachment,
-      Value<int>? detachmentId}) {
+      Value<int?>? detachmentId}) {
     return TdetachmentabilityCompanion(
       id: id ?? this.id,
       factionId: factionId ?? this.factionId,
@@ -6645,11 +6643,11 @@ class $TdatasheetunitcompositionTable extends Tdatasheetunitcomposition
       const VerificationMeta('description');
   @override
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
-      'description', aliasedName, false,
+      'description', aliasedName, true,
       additionalChecks:
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 200),
       type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [datasheetId, line, description];
   @override
@@ -6682,8 +6680,6 @@ class $TdatasheetunitcompositionTable extends Tdatasheetunitcomposition
           _descriptionMeta,
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
-    } else if (isInserting) {
-      context.missing(_descriptionMeta);
     }
     return context;
   }
@@ -6700,7 +6696,7 @@ class $TdatasheetunitcompositionTable extends Tdatasheetunitcomposition
       line: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}line'])!,
       description: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
     );
   }
 
@@ -6714,17 +6710,17 @@ class TdatasheetunitcompositionData extends DataClass
     implements Insertable<TdatasheetunitcompositionData> {
   final int datasheetId;
   final int line;
-  final String description;
+  final String? description;
   const TdatasheetunitcompositionData(
-      {required this.datasheetId,
-      required this.line,
-      required this.description});
+      {required this.datasheetId, required this.line, this.description});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['datasheet_id'] = Variable<int>(datasheetId);
     map['line'] = Variable<int>(line);
-    map['description'] = Variable<String>(description);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
     return map;
   }
 
@@ -6732,7 +6728,9 @@ class TdatasheetunitcompositionData extends DataClass
     return TdatasheetunitcompositionCompanion(
       datasheetId: Value(datasheetId),
       line: Value(line),
-      description: Value(description),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
     );
   }
 
@@ -6742,7 +6740,7 @@ class TdatasheetunitcompositionData extends DataClass
     return TdatasheetunitcompositionData(
       datasheetId: serializer.fromJson<int>(json['datasheetId']),
       line: serializer.fromJson<int>(json['line']),
-      description: serializer.fromJson<String>(json['description']),
+      description: serializer.fromJson<String?>(json['description']),
     );
   }
   @override
@@ -6751,16 +6749,18 @@ class TdatasheetunitcompositionData extends DataClass
     return <String, dynamic>{
       'datasheetId': serializer.toJson<int>(datasheetId),
       'line': serializer.toJson<int>(line),
-      'description': serializer.toJson<String>(description),
+      'description': serializer.toJson<String?>(description),
     };
   }
 
   TdatasheetunitcompositionData copyWith(
-          {int? datasheetId, int? line, String? description}) =>
+          {int? datasheetId,
+          int? line,
+          Value<String?> description = const Value.absent()}) =>
       TdatasheetunitcompositionData(
         datasheetId: datasheetId ?? this.datasheetId,
         line: line ?? this.line,
-        description: description ?? this.description,
+        description: description.present ? description.value : this.description,
       );
   TdatasheetunitcompositionData copyWithCompanion(
       TdatasheetunitcompositionCompanion data) {
@@ -6798,7 +6798,7 @@ class TdatasheetunitcompositionCompanion
     extends UpdateCompanion<TdatasheetunitcompositionData> {
   final Value<int> datasheetId;
   final Value<int> line;
-  final Value<String> description;
+  final Value<String?> description;
   final Value<int> rowid;
   const TdatasheetunitcompositionCompanion({
     this.datasheetId = const Value.absent(),
@@ -6809,11 +6809,10 @@ class TdatasheetunitcompositionCompanion
   TdatasheetunitcompositionCompanion.insert({
     required int datasheetId,
     required int line,
-    required String description,
+    this.description = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : datasheetId = Value(datasheetId),
-        line = Value(line),
-        description = Value(description);
+        line = Value(line);
   static Insertable<TdatasheetunitcompositionData> custom({
     Expression<int>? datasheetId,
     Expression<int>? line,
@@ -6831,7 +6830,7 @@ class TdatasheetunitcompositionCompanion
   TdatasheetunitcompositionCompanion copyWith(
       {Value<int>? datasheetId,
       Value<int>? line,
-      Value<String>? description,
+      Value<String?>? description,
       Value<int>? rowid}) {
     return TdatasheetunitcompositionCompanion(
       datasheetId: datasheetId ?? this.datasheetId,
@@ -10555,8 +10554,8 @@ typedef $$TenhancementTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function(
         {bool factionId, bool detachmentId, bool tdatasheetenhancementRefs})>;
 typedef $$TstratagemTableCreateCompanionBuilder = TstratagemCompanion Function({
-  required String factionId,
-  required String name,
+  Value<String?> factionId,
+  Value<String?> name,
   Value<int> id,
   Value<String?> type,
   Value<int?> commandPointCost,
@@ -10564,12 +10563,12 @@ typedef $$TstratagemTableCreateCompanionBuilder = TstratagemCompanion Function({
   Value<String?> turn,
   Value<String?> phase,
   Value<String?> detachment,
-  required int detachmentId,
+  Value<int?> detachmentId,
   Value<String?> description,
 });
 typedef $$TstratagemTableUpdateCompanionBuilder = TstratagemCompanion Function({
-  Value<String> factionId,
-  Value<String> name,
+  Value<String?> factionId,
+  Value<String?> name,
   Value<int> id,
   Value<String?> type,
   Value<int?> commandPointCost,
@@ -10577,7 +10576,7 @@ typedef $$TstratagemTableUpdateCompanionBuilder = TstratagemCompanion Function({
   Value<String?> turn,
   Value<String?> phase,
   Value<String?> detachment,
-  Value<int> detachmentId,
+  Value<int?> detachmentId,
   Value<String?> description,
 });
 
@@ -10589,9 +10588,9 @@ final class $$TstratagemTableReferences
       db.tdetachment.createAlias(
           $_aliasNameGenerator(db.tstratagem.detachmentId, db.tdetachment.id));
 
-  $$TdetachmentTableProcessedTableManager get detachmentId {
-    final $_column = $_itemColumn<int>('detachment_id')!;
-
+  $$TdetachmentTableProcessedTableManager? get detachmentId {
+    final $_column = $_itemColumn<int>('detachment_id');
+    if ($_column == null) return null;
     final manager = $$TdetachmentTableTableManager($_db, $_db.tdetachment)
         .filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_detachmentIdTable($_db));
@@ -10868,8 +10867,8 @@ class $$TstratagemTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$TstratagemTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> factionId = const Value.absent(),
-            Value<String> name = const Value.absent(),
+            Value<String?> factionId = const Value.absent(),
+            Value<String?> name = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<String?> type = const Value.absent(),
             Value<int?> commandPointCost = const Value.absent(),
@@ -10877,7 +10876,7 @@ class $$TstratagemTableTableManager extends RootTableManager<
             Value<String?> turn = const Value.absent(),
             Value<String?> phase = const Value.absent(),
             Value<String?> detachment = const Value.absent(),
-            Value<int> detachmentId = const Value.absent(),
+            Value<int?> detachmentId = const Value.absent(),
             Value<String?> description = const Value.absent(),
           }) =>
               TstratagemCompanion(
@@ -10894,8 +10893,8 @@ class $$TstratagemTableTableManager extends RootTableManager<
             description: description,
           ),
           createCompanionCallback: ({
-            required String factionId,
-            required String name,
+            Value<String?> factionId = const Value.absent(),
+            Value<String?> name = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<String?> type = const Value.absent(),
             Value<int?> commandPointCost = const Value.absent(),
@@ -10903,7 +10902,7 @@ class $$TstratagemTableTableManager extends RootTableManager<
             Value<String?> turn = const Value.absent(),
             Value<String?> phase = const Value.absent(),
             Value<String?> detachment = const Value.absent(),
-            required int detachmentId,
+            Value<int?> detachmentId = const Value.absent(),
             Value<String?> description = const Value.absent(),
           }) =>
               TstratagemCompanion.insert(
@@ -11840,7 +11839,7 @@ typedef $$TdatasheetwargearTableCreateCompanionBuilder
   required int datasheetId,
   Value<int?> line,
   required int lineInWargear,
-  required String dice,
+  Value<String?> dice,
   Value<String?> name,
   Value<String?> description,
   Value<int?> range,
@@ -11857,7 +11856,7 @@ typedef $$TdatasheetwargearTableUpdateCompanionBuilder
   Value<int> datasheetId,
   Value<int?> line,
   Value<int> lineInWargear,
-  Value<String> dice,
+  Value<String?> dice,
   Value<String?> name,
   Value<String?> description,
   Value<int?> range,
@@ -12122,7 +12121,7 @@ class $$TdatasheetwargearTableTableManager extends RootTableManager<
             Value<int> datasheetId = const Value.absent(),
             Value<int?> line = const Value.absent(),
             Value<int> lineInWargear = const Value.absent(),
-            Value<String> dice = const Value.absent(),
+            Value<String?> dice = const Value.absent(),
             Value<String?> name = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<int?> range = const Value.absent(),
@@ -12154,7 +12153,7 @@ class $$TdatasheetwargearTableTableManager extends RootTableManager<
             required int datasheetId,
             Value<int?> line = const Value.absent(),
             required int lineInWargear,
-            required String dice,
+            Value<String?> dice = const Value.absent(),
             Value<String?> name = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<int?> range = const Value.absent(),
@@ -13712,7 +13711,7 @@ typedef $$TdetachmentabilityTableCreateCompanionBuilder
   Value<String?> legend,
   Value<String?> description,
   Value<String?> detachment,
-  required int detachmentId,
+  Value<int?> detachmentId,
 });
 typedef $$TdetachmentabilityTableUpdateCompanionBuilder
     = TdetachmentabilityCompanion Function({
@@ -13722,7 +13721,7 @@ typedef $$TdetachmentabilityTableUpdateCompanionBuilder
   Value<String?> legend,
   Value<String?> description,
   Value<String?> detachment,
-  Value<int> detachmentId,
+  Value<int?> detachmentId,
 });
 
 final class $$TdetachmentabilityTableReferences extends BaseReferences<
@@ -13749,9 +13748,9 @@ final class $$TdetachmentabilityTableReferences extends BaseReferences<
       db.tdetachment.createAlias($_aliasNameGenerator(
           db.tdetachmentability.detachmentId, db.tdetachment.id));
 
-  $$TdetachmentTableProcessedTableManager get detachmentId {
-    final $_column = $_itemColumn<int>('detachment_id')!;
-
+  $$TdetachmentTableProcessedTableManager? get detachmentId {
+    final $_column = $_itemColumn<int>('detachment_id');
+    if ($_column == null) return null;
     final manager = $$TdetachmentTableTableManager($_db, $_db.tdetachment)
         .filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_detachmentIdTable($_db));
@@ -14058,7 +14057,7 @@ class $$TdetachmentabilityTableTableManager extends RootTableManager<
             Value<String?> legend = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<String?> detachment = const Value.absent(),
-            Value<int> detachmentId = const Value.absent(),
+            Value<int?> detachmentId = const Value.absent(),
           }) =>
               TdetachmentabilityCompanion(
             id: id,
@@ -14076,7 +14075,7 @@ class $$TdetachmentabilityTableTableManager extends RootTableManager<
             Value<String?> legend = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<String?> detachment = const Value.absent(),
-            required int detachmentId,
+            Value<int?> detachmentId = const Value.absent(),
           }) =>
               TdetachmentabilityCompanion.insert(
             id: id,
@@ -14513,14 +14512,14 @@ typedef $$TdatasheetunitcompositionTableCreateCompanionBuilder
     = TdatasheetunitcompositionCompanion Function({
   required int datasheetId,
   required int line,
-  required String description,
+  Value<String?> description,
   Value<int> rowid,
 });
 typedef $$TdatasheetunitcompositionTableUpdateCompanionBuilder
     = TdatasheetunitcompositionCompanion Function({
   Value<int> datasheetId,
   Value<int> line,
-  Value<String> description,
+  Value<String?> description,
   Value<int> rowid,
 });
 
@@ -14684,7 +14683,7 @@ class $$TdatasheetunitcompositionTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> datasheetId = const Value.absent(),
             Value<int> line = const Value.absent(),
-            Value<String> description = const Value.absent(),
+            Value<String?> description = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TdatasheetunitcompositionCompanion(
@@ -14696,7 +14695,7 @@ class $$TdatasheetunitcompositionTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             required int datasheetId,
             required int line,
-            required String description,
+            Value<String?> description = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TdatasheetunitcompositionCompanion.insert(

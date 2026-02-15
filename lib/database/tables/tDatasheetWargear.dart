@@ -5,7 +5,7 @@ class Tdatasheetwargear extends Table {
   IntColumn get  datasheetId => integer().references(Tdatasheet,#id)();
   IntColumn get line => integer().nullable()();
   IntColumn get lineInWargear => integer()();
-  TextColumn get dice => text().withLength(min: 1, max: 200)();
+  TextColumn get dice => text().nullable()();
   TextColumn get name => text().nullable()();
   TextColumn get description => text().nullable()();
   IntColumn get range => integer().nullable()();

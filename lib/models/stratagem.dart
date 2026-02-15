@@ -31,7 +31,7 @@ class Stratagem {
 
   factory Stratagem.fromCSV(List<String> row) {
     return Stratagem(
-      factionId: row[0],
+      factionId: row[0].isNotEmpty ? row[0] : null,
       name: row[1].isNotEmpty ? row[1] : null,
       id: CSVParserUtils.parseRequiredInt(row, 2, 'id'),
       type: row[3].isNotEmpty ? row[3] : null,

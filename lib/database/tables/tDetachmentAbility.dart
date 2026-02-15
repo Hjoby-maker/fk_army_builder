@@ -9,7 +9,7 @@ class Tdetachmentability extends Table {
   TextColumn get legend => text().nullable()();
   TextColumn get description => text().nullable()();
   TextColumn get detachment => text().nullable()();
-  IntColumn get detachmentId => integer().references(Tdetachment, #id)();
+  IntColumn get detachmentId => integer().references(Tdetachment, #id).nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
