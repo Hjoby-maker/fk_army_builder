@@ -312,6 +312,52 @@ class CSVDownloadService {
         await _db.saveDatasheetEnhancement(datasheetEnhancementList);
         await _db.debugLenTdatasheetEnhancement();
         break;
+      case 'Datasheets_keywords.csv':
+        final datasheetKeywordList = parsedData.cast<DatasheetKeyword>();
+        await _db.saveDatasheetKeyword(datasheetKeywordList);
+        await _db.debugLenTdatasheetKeyword();
+        break;
+      case 'Datasheets_leader.csv':
+        final datasheetLeaderList = parsedData.cast<DatasheetLeader>();
+        await _db.saveDatasheetLeader(datasheetLeaderList);
+        await _db.debugLenTdatasheetLeader();
+        break;
+      case 'Datasheets_models_cost.csv':
+        final datasheetModelCostList = parsedData.cast<DatasheetModelCost>();
+        await _db.saveDatasheetModelCost(datasheetModelCostList);
+        await _db.debugLenTdatasheetModelCost();
+        break;
+      case 'Datasheets_options.csv':
+        final datasheetOptionList = parsedData.cast<DatasheetOption>();
+        await _db.saveDatasheetOption(datasheetOptionList);
+        await _db.debugLenTdatasheetOption();
+        break;
+      case 'Datasheets_stratagems.csv':
+        final datasheetStratagemList = parsedData.cast<DatasheetStratagem>();
+        await _db.saveDatasheetStratagem(datasheetStratagemList);
+        await _db.debugLenTdatasheetStratagem();
+        break;
+      case 'Datasheets_unit_composition.csv':
+        final datasheetUnitCompositionList =
+            parsedData.cast<DatasheetUnitComposition>();
+        await _db.saveDatasheetUnitComposition(datasheetUnitCompositionList);
+        await _db.debugLenTdatasheetUnitComposition();
+        break;
+      case 'Datasheets_wargear.csv':
+        final datasheetWargearList = parsedData.cast<DatasheetWargear>();
+        await _db.saveDatasheetWargear(datasheetWargearList);
+        await _db.debugLenTdatasheetWargear();
+        break;
+      case 'Detachment_abilities.csv':
+        final detachmentAbilityList = parsedData.cast<DetachmentAbility>();
+        await _db.saveDetachmentAbility(detachmentAbilityList);
+        await _db.debugLenTdetachmentAbility();
+        break;
+      case 'Last_update.csv':
+        final lastUpdateList = parsedData.cast<LastUpdate>();
+        await _db.saveLastUpdate(lastUpdateList);
+        await _db.debugLenTlastUpdate();
+        break;
     }
   }
 }

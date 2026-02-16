@@ -201,11 +201,155 @@ class DatabaseService {
       _datasheetEnhancementDao.debugLenTdatasheetEnhancement();
   //===========================================================================
 
+  // ===========================DatasheetKeyword methods===================
+  Future<List<DatasheetKeyword>> getAllDatasheetKeywordModels() =>
+      _datasheetKeywordDao.getAllKeywordModels();
+
+  Future<void> saveDatasheetKeyword(List<DatasheetKeyword> datasheetKeyword) {
+    final companions =
+        datasheetKeyword.map(ModelToCompanion.fromDatasheetKeyword).toList();
+    return _datasheetKeywordDao.insertAllKeywords(companions);
+  }
+
+  Future debugLenTdatasheetKeyword() =>
+      _datasheetKeywordDao.debugLenTdatasheetKeyword();
+  //===========================================================================
+
+  // ===========================DatasheetLeader methods===================
+  Future<List<DatasheetLeader>> getAllDatasheetLeaderModels() =>
+      _datasheetLeaderDao.getAllLeaderModels();
+
+  Future<void> saveDatasheetLeader(List<DatasheetLeader> datasheetLeader) {
+    final companions =
+        datasheetLeader.map(ModelToCompanion.fromDatasheetLeader).toList();
+    return _datasheetLeaderDao.insertAllLeaders(companions);
+  }
+
+  Future debugLenTdatasheetLeader() =>
+      _datasheetLeaderDao.debugLenTdatasheetLeader();
+  //===========================================================================
+
+  // ===========================DatasheetModelCost methods===================
+  Future<List<DatasheetModelCost>> getAllDatasheetModelCostModels() =>
+      _datasheetModelCostDao.getAllCostModels();
+
+  Future<void> saveDatasheetModelCost(
+      List<DatasheetModelCost> datasheetModelCost) {
+    final companions = datasheetModelCost
+        .map(ModelToCompanion.fromDatasheetModelCost)
+        .toList();
+    return _datasheetModelCostDao.insertAllCosts(companions);
+  }
+
+  Future debugLenTdatasheetModelCost() =>
+      _datasheetModelCostDao.debugLenTdatasheetModelCost();
+  //===========================================================================
+
+  // ===========================DatasheetOption methods===================
+  Future<List<DatasheetOption>> getAllDatasheetOptionModels() =>
+      _datasheetOptionDao.getAllOptionModels();
+
+  Future<void> saveDatasheetOption(List<DatasheetOption> datasheetOption) {
+    final companions =
+        datasheetOption.map(ModelToCompanion.fromDatasheetOption).toList();
+    return _datasheetOptionDao.insertAllOptions(companions);
+  }
+
+  Future debugLenTdatasheetOption() =>
+      _datasheetOptionDao.debugLenTdatasheetOption();
+  //===========================================================================
+
+  // ===========================DatasheetStratagem methods===================
+  Future<List<DatasheetStratagem>> getAllDatasheetStratagemModels() =>
+      _datasheetStratagemDao.getAllModels();
+
+  Future<void> saveDatasheetStratagem(
+      List<DatasheetStratagem> datasheetStratagem) {
+    final companions = datasheetStratagem
+        .map(ModelToCompanion.fromDatasheetStratagem)
+        .toList();
+    return _datasheetStratagemDao.insertAll(companions);
+  }
+
+  Future debugLenTdatasheetStratagem() =>
+      _datasheetStratagemDao.debugLenTdatasheetStratagem();
+  //===========================================================================
+
+  // ===========================DatasheetUnitComposition methods===============
+  Future<List<DatasheetUnitComposition>>
+      getAllDatasheetUnitCompositionModels() =>
+          _datasheetUnitCompositionDao.getAllModels();
+
+  Future<void> saveDatasheetUnitComposition(
+      List<DatasheetUnitComposition> datasheetUnitComposition) {
+    final companions = datasheetUnitComposition
+        .map(ModelToCompanion.fromDatasheetUnitComposition)
+        .toList();
+    return _datasheetUnitCompositionDao.insertAll(companions);
+  }
+
+  Future debugLenTdatasheetUnitComposition() =>
+      _datasheetUnitCompositionDao.debugLenTdatasheetUnitComposition();
+  //===========================================================================
+
+  // ===========================DatasheetWargear methods===============
+  Future<List<DatasheetWargear>> getAllDatasheetWargearModels() =>
+      _datasheetWargearDao.getAllWargearModels();
+
+  Future<void> saveDatasheetWargear(List<DatasheetWargear> datasheetWargear) {
+    final companions =
+        datasheetWargear.map(ModelToCompanion.fromDatasheetWargear).toList();
+    return _datasheetWargearDao.insertAllWargear(companions);
+  }
+
+  Future debugLenTdatasheetWargear() =>
+      _datasheetWargearDao.debugLenTdatasheetWargear();
+  //===========================================================================
+
+  // ===========================DetachmentAbility methods===============
+  Future<List<DetachmentAbility>> getAllDetachmentAbilityModels() =>
+      _detachmentAbilityDao.getAllDetachmentAbilityModels();
+
+  Future<void> saveDetachmentAbility(
+      List<DetachmentAbility> detachmentAbility) {
+    final companions =
+        detachmentAbility.map(ModelToCompanion.fromDetachmentAbility).toList();
+    return _detachmentAbilityDao.insertAllDetachmentAbilities(companions);
+  }
+
+  Future debugLenTdetachmentAbility() =>
+      _detachmentAbilityDao.debugLenTdetachmentAbility();
+  //===========================================================================
+
+  // ===========================LastUpdate methods===============
+  Future<List<LastUpdate>> getAllLastUpdateModels() =>
+      _lastUpdateDao.getAllLastUpdateModels();
+
+  Future<void> saveLastUpdate(List<LastUpdate> lastUpdate) {
+    final companions = lastUpdate.map(ModelToCompanion.fromLastUpdate).toList();
+    return _lastUpdateDao.insertAllLastUpdates(companions);
+  }
+
+  Future debugLenTlastUpdate() => _lastUpdateDao.debugLenTlastUpdate();
+  //===========================================================================
+
   // Очистка БД при перезагрузке данных
   Future<void> clearAllData() async {
     await _database.transaction(() async {
       // Удаляем в правильном порядке (с учетом внешних ключей)
-
+      await _database.delete(_database.tdatasheetoption).go();
+      await _database.delete(_database.tdatasheetmodelcost).go();
+      await _database.delete(_database.tdatasheetleader).go();
+      await _database.delete(_database.tdatasheetkeyword).go();
+      await _database.delete(_database.tdatasheetenhancement).go();
+      await _database.delete(_database.tdatasheetdetachmentability).go();
+      await _database.delete(_database.tsource).go();
+      await _database.delete(_database.tdatasheetunitcomposition).go();
+      await _database.delete(_database.tdetachment).go();
+      await _database.delete(_database.tdatasheetstratagem).go();
+      await _database.delete(_database.tdatasheetwargear).go();
+      await _database.delete(_database.tdetachmentability).go();
+      await _database.delete(_database.tstratagem).go();
       await _database.delete(_database.tenhancement).go();
       await _database.delete(_database.tdatasheetmodel).go();
       await _database.delete(_database.tdatasheetability).go();

@@ -2913,7 +2913,7 @@ class $TlastupdateTable extends Tlastupdate
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {lastUpdate};
   @override
   TlastupdateData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -4808,6 +4808,15 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $TdatasheetkeywordTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _datasheetIdMeta =
       const VerificationMeta('datasheetId');
   @override
@@ -4839,7 +4848,7 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
           'CHECK ("is_faction_keyword" IN (0, 1))'));
   @override
   List<GeneratedColumn> get $columns =>
-      [datasheetId, keyword, model, isFactionKeyword];
+      [id, datasheetId, keyword, model, isFactionKeyword];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4851,6 +4860,9 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
     if (data.containsKey('datasheet_id')) {
       context.handle(
           _datasheetIdMeta,
@@ -4879,11 +4891,13 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TdatasheetkeywordData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TdatasheetkeywordData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       datasheetId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}datasheet_id'])!,
       keyword: attachedDatabase.typeMapping
@@ -4903,18 +4917,21 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
 
 class TdatasheetkeywordData extends DataClass
     implements Insertable<TdatasheetkeywordData> {
+  final int id;
   final int datasheetId;
   final String? keyword;
   final String? model;
   final bool isFactionKeyword;
   const TdatasheetkeywordData(
-      {required this.datasheetId,
+      {required this.id,
+      required this.datasheetId,
       this.keyword,
       this.model,
       required this.isFactionKeyword});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
     map['datasheet_id'] = Variable<int>(datasheetId);
     if (!nullToAbsent || keyword != null) {
       map['keyword'] = Variable<String>(keyword);
@@ -4928,6 +4945,7 @@ class TdatasheetkeywordData extends DataClass
 
   TdatasheetkeywordCompanion toCompanion(bool nullToAbsent) {
     return TdatasheetkeywordCompanion(
+      id: Value(id),
       datasheetId: Value(datasheetId),
       keyword: keyword == null && nullToAbsent
           ? const Value.absent()
@@ -4942,6 +4960,7 @@ class TdatasheetkeywordData extends DataClass
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TdatasheetkeywordData(
+      id: serializer.fromJson<int>(json['id']),
       datasheetId: serializer.fromJson<int>(json['datasheetId']),
       keyword: serializer.fromJson<String?>(json['keyword']),
       model: serializer.fromJson<String?>(json['model']),
@@ -4952,6 +4971,7 @@ class TdatasheetkeywordData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
       'datasheetId': serializer.toJson<int>(datasheetId),
       'keyword': serializer.toJson<String?>(keyword),
       'model': serializer.toJson<String?>(model),
@@ -4960,11 +4980,13 @@ class TdatasheetkeywordData extends DataClass
   }
 
   TdatasheetkeywordData copyWith(
-          {int? datasheetId,
+          {int? id,
+          int? datasheetId,
           Value<String?> keyword = const Value.absent(),
           Value<String?> model = const Value.absent(),
           bool? isFactionKeyword}) =>
       TdatasheetkeywordData(
+        id: id ?? this.id,
         datasheetId: datasheetId ?? this.datasheetId,
         keyword: keyword.present ? keyword.value : this.keyword,
         model: model.present ? model.value : this.model,
@@ -4972,6 +4994,7 @@ class TdatasheetkeywordData extends DataClass
       );
   TdatasheetkeywordData copyWithCompanion(TdatasheetkeywordCompanion data) {
     return TdatasheetkeywordData(
+      id: data.id.present ? data.id.value : this.id,
       datasheetId:
           data.datasheetId.present ? data.datasheetId.value : this.datasheetId,
       keyword: data.keyword.present ? data.keyword.value : this.keyword,
@@ -4985,6 +5008,7 @@ class TdatasheetkeywordData extends DataClass
   @override
   String toString() {
     return (StringBuffer('TdatasheetkeywordData(')
+          ..write('id: $id, ')
           ..write('datasheetId: $datasheetId, ')
           ..write('keyword: $keyword, ')
           ..write('model: $model, ')
@@ -4995,11 +5019,12 @@ class TdatasheetkeywordData extends DataClass
 
   @override
   int get hashCode =>
-      Object.hash(datasheetId, keyword, model, isFactionKeyword);
+      Object.hash(id, datasheetId, keyword, model, isFactionKeyword);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is TdatasheetkeywordData &&
+          other.id == this.id &&
           other.datasheetId == this.datasheetId &&
           other.keyword == this.keyword &&
           other.model == this.model &&
@@ -5008,60 +5033,63 @@ class TdatasheetkeywordData extends DataClass
 
 class TdatasheetkeywordCompanion
     extends UpdateCompanion<TdatasheetkeywordData> {
+  final Value<int> id;
   final Value<int> datasheetId;
   final Value<String?> keyword;
   final Value<String?> model;
   final Value<bool> isFactionKeyword;
-  final Value<int> rowid;
   const TdatasheetkeywordCompanion({
+    this.id = const Value.absent(),
     this.datasheetId = const Value.absent(),
     this.keyword = const Value.absent(),
     this.model = const Value.absent(),
     this.isFactionKeyword = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   TdatasheetkeywordCompanion.insert({
+    this.id = const Value.absent(),
     required int datasheetId,
     this.keyword = const Value.absent(),
     this.model = const Value.absent(),
     required bool isFactionKeyword,
-    this.rowid = const Value.absent(),
   })  : datasheetId = Value(datasheetId),
         isFactionKeyword = Value(isFactionKeyword);
   static Insertable<TdatasheetkeywordData> custom({
+    Expression<int>? id,
     Expression<int>? datasheetId,
     Expression<String>? keyword,
     Expression<String>? model,
     Expression<bool>? isFactionKeyword,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (datasheetId != null) 'datasheet_id': datasheetId,
       if (keyword != null) 'keyword': keyword,
       if (model != null) 'model': model,
       if (isFactionKeyword != null) 'is_faction_keyword': isFactionKeyword,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
   TdatasheetkeywordCompanion copyWith(
-      {Value<int>? datasheetId,
+      {Value<int>? id,
+      Value<int>? datasheetId,
       Value<String?>? keyword,
       Value<String?>? model,
-      Value<bool>? isFactionKeyword,
-      Value<int>? rowid}) {
+      Value<bool>? isFactionKeyword}) {
     return TdatasheetkeywordCompanion(
+      id: id ?? this.id,
       datasheetId: datasheetId ?? this.datasheetId,
       keyword: keyword ?? this.keyword,
       model: model ?? this.model,
       isFactionKeyword: isFactionKeyword ?? this.isFactionKeyword,
-      rowid: rowid ?? this.rowid,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
     if (datasheetId.present) {
       map['datasheet_id'] = Variable<int>(datasheetId.value);
     }
@@ -5074,20 +5102,17 @@ class TdatasheetkeywordCompanion
     if (isFactionKeyword.present) {
       map['is_faction_keyword'] = Variable<bool>(isFactionKeyword.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
   @override
   String toString() {
     return (StringBuffer('TdatasheetkeywordCompanion(')
+          ..write('id: $id, ')
           ..write('datasheetId: $datasheetId, ')
           ..write('keyword: $keyword, ')
           ..write('model: $model, ')
-          ..write('isFactionKeyword: $isFactionKeyword, ')
-          ..write('rowid: $rowid')
+          ..write('isFactionKeyword: $isFactionKeyword')
           ..write(')'))
         .toString();
   }
@@ -5432,7 +5457,7 @@ class $TdatasheetleaderTable extends Tdatasheetleader
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {leaderId, attachedId};
   @override
   TdatasheetleaderData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -12240,19 +12265,19 @@ typedef $$TdatasheetwargearTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function({bool datasheetId})>;
 typedef $$TdatasheetkeywordTableCreateCompanionBuilder
     = TdatasheetkeywordCompanion Function({
+  Value<int> id,
   required int datasheetId,
   Value<String?> keyword,
   Value<String?> model,
   required bool isFactionKeyword,
-  Value<int> rowid,
 });
 typedef $$TdatasheetkeywordTableUpdateCompanionBuilder
     = TdatasheetkeywordCompanion Function({
+  Value<int> id,
   Value<int> datasheetId,
   Value<String?> keyword,
   Value<String?> model,
   Value<bool> isFactionKeyword,
-  Value<int> rowid,
 });
 
 final class $$TdatasheetkeywordTableReferences extends BaseReferences<
@@ -12285,6 +12310,9 @@ class $$TdatasheetkeywordTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get keyword => $composableBuilder(
       column: $table.keyword, builder: (column) => ColumnFilters(column));
 
@@ -12325,6 +12353,9 @@ class $$TdatasheetkeywordTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get keyword => $composableBuilder(
       column: $table.keyword, builder: (column) => ColumnOrderings(column));
 
@@ -12365,6 +12396,9 @@ class $$TdatasheetkeywordTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
   GeneratedColumn<String> get keyword =>
       $composableBuilder(column: $table.keyword, builder: (column) => column);
 
@@ -12420,32 +12454,32 @@ class $$TdatasheetkeywordTableTableManager extends RootTableManager<
               $$TdatasheetkeywordTableAnnotationComposer(
                   $db: db, $table: table),
           updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
             Value<int> datasheetId = const Value.absent(),
             Value<String?> keyword = const Value.absent(),
             Value<String?> model = const Value.absent(),
             Value<bool> isFactionKeyword = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
           }) =>
               TdatasheetkeywordCompanion(
+            id: id,
             datasheetId: datasheetId,
             keyword: keyword,
             model: model,
             isFactionKeyword: isFactionKeyword,
-            rowid: rowid,
           ),
           createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
             required int datasheetId,
             Value<String?> keyword = const Value.absent(),
             Value<String?> model = const Value.absent(),
             required bool isFactionKeyword,
-            Value<int> rowid = const Value.absent(),
           }) =>
               TdatasheetkeywordCompanion.insert(
+            id: id,
             datasheetId: datasheetId,
             keyword: keyword,
             model: model,
             isFactionKeyword: isFactionKeyword,
-            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

@@ -14,18 +14,18 @@ const List<String> csvFiles = [
   'Datasheets_abilities.csv', //11
   'Datasheets_detachment_abilities.csv', //1
   'Datasheets_enhancements.csv', //1
-  'Datasheets_keywords.csv',
-  'Datasheets_leader.csv',
+  'Datasheets_keywords.csv', //1
+  'Datasheets_leader.csv', //1
   'Datasheets_models.csv', //1
-  'Datasheets_models_cost.csv',
-  'Datasheets_options.csv',
-  'Datasheets_stratagems.csv',
-  'Datasheets_unit_composition.csv',
-  'Datasheets_wargear.csv',
+  'Datasheets_models_cost.csv', //1
+  'Datasheets_options.csv', //1
+  'Datasheets_stratagems.csv', //1
+  'Datasheets_unit_composition.csv', //1
+  'Datasheets_wargear.csv', //1
   'Detachments.csv', //1
-  'Detachment_abilities.csv',
+  'Detachment_abilities.csv', //1
   'Enhancements.csv', //1
-  'Last_update.csv',
+  'Last_update.csv', //1
   'Source.csv', //1
   'Stratagems.csv', //1
 ];
