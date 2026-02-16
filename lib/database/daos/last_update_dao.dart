@@ -6,32 +6,47 @@ import 'package:fk_army_builder/models/index.dart' as models;
 part 'last_update_dao.g.dart';
 
 @DriftAccessor(tables: [Tlastupdate])
-class LastUpdateDao extends DatabaseAccessor<AppDatabase> with _$LastUpdateDaoMixin {
+class LastUpdateDao extends DatabaseAccessor<AppDatabase>
+    with _$LastUpdateDaoMixin {
   LastUpdateDao(AppDatabase db) : super(db);
 
   // CRUD
-  Future<List<TlastupdateData>> getAllLastUpdates() => select(tlastupdate).get();
-  
+  Future<List<TlastupdateData>> getAllLastUpdates() =>
+      select(tlastupdate).get();
+
   Future<int> insertLastUpdate(TlastupdateCompanion lastUpdate) =>
       into(tlastupdate).insert(lastUpdate);
-  
-  Future<void> insertAllLastUpdates(List<TlastupdateCompanion> lastUpdatesList) =>
+
+  Future<void> insertAllLastUpdates(
+          List<TlastupdateCompanion> lastUpdatesList) =>
       batch((batch) {
         batch.insertAllOnConflictUpdate(tlastupdate, lastUpdatesList);
       });
-  
+
   // Специальные методы
-  Future<TlastupdateData?> getLatestUpdate() =>
-      (select(tlastupdate)
-        ..orderBy([(t) => OrderingTerm(expression: t.lastUpdate, mode: OrderingMode.desc)])
-        ..limit(1)
-      ).getSingleOrNull();
+  Future<TlastupdateData?> getLatestUpdate() => (select(tlastupdate)
+        ..orderBy([
+          (t) => OrderingTerm(expression: t.lastUpdate, mode: OrderingMode.desc)
+        ])
+        ..limit(1))
+      .getSingleOrNull();
 
   // Конвертация в модели
   Future<List<models.LastUpdate>> getAllLastUpdateModels() async {
     final data = await getAllLastUpdates();
-    return data.map((l) => models.LastUpdate(
-      lastUpdate: l.lastUpdate,
-    )).toList();
+    return data
+        .map((l) => models.LastUpdate(
+              lastUpdate: l.lastUpdate,
+            ))
+        .toList();
   }
-} 
+
+  Future<void> debugLenTlastUpdate() async {
+    final row_count =
+        await customSelect('select count(*) as count_ from tlastupdate;').get();
+    // row.data – Map<String, dynamic>
+    for (final _row in row_count) {
+      print('tlastupdate count: ${_row.data['count_']} ');
+    }
+  }
+}

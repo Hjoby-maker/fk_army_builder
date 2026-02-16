@@ -22,36 +22,38 @@ class CSVDownloadService {
     final Map<String, dynamic> allParsedData = {};
 
     await _db.clearAllData();
-    
+
     for (final fileName in csvFiles) {
       try {
         if (onFileProgress != null) onFileProgress(fileName, 0);
-        
+
         final result = await _downloadSingleCSV(
           fileName,
           onProgress: (progress) {
             if (onFileProgress != null) onFileProgress(fileName, progress);
           },
         );
-        
+
         results[fileName] = result;
+        /*if (fileName == 'Detachments.csv') {
+          print(result.parsedData);
+        }*/
         //print(result.parsedData);
 
         await _saveParsedData(fileName, result.parsedData);
 
         if (result.success && result.parsedData != null) {
-        allParsedData[fileName] = result.parsedData;
+          allParsedData[fileName] = result.parsedData;
         }
-        
+
         if (onFileComplete != null) onFileComplete(fileName, result.success);
-        
       } catch (e) {
         results[fileName] = DownloadResult(
           success: false,
           error: e.toString(),
           fileName: fileName,
         );
-        
+
         if (onFileComplete != null) onFileComplete(fileName, false);
       }
     }
@@ -66,7 +68,7 @@ class CSVDownloadService {
   }) async {
     try {
       if (onProgress != null) onProgress(10);
-      
+
       final url = '$csvBaseUrl/$fileName';
       final response = await http.get(Uri.parse(url));
 
@@ -81,7 +83,7 @@ class CSVDownloadService {
 
       final bytes = response.bodyBytes;
       if (onProgress != null) onProgress(50);
-      
+
       final csvString = utf8.decode(bytes);
       if (onProgress != null) onProgress(70);
 
@@ -123,7 +125,7 @@ class CSVDownloadService {
   }) async {
     try {
       if (onProgress != null) onProgress(10);
-      
+
       final url = '$csvBaseUrl/$fileName';
       final response = await http.get(Uri.parse(url));
 
@@ -138,7 +140,7 @@ class CSVDownloadService {
 
       final bytes = response.bodyBytes;
       if (onProgress != null) onProgress(50);
-      
+
       final csvString = utf8.decode(bytes);
       if (onProgress != null) onProgress(70);
 
@@ -188,11 +190,11 @@ class CSVDownloadService {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$fileName');
-      
+
       if (!await file.exists()) {
         throw Exception('Файл $fileName не найден');
       }
-      
+
       final csvString = await file.readAsString();
       return _parseCSVData(fileName, csvString);
     } catch (e) {
@@ -210,11 +212,11 @@ class CSVDownloadService {
   // Проверка существования всех файлов
   Future<Map<String, bool>> checkAllFilesExist() async {
     final Map<String, bool> results = {};
-    
+
     for (final fileName in csvFiles) {
       results[fileName] = await fileExists(fileName);
     }
-    
+
     return results;
   }
 
@@ -231,7 +233,7 @@ class CSVDownloadService {
   Future<DownloadStats> getDownloadStats() async {
     final stats = DownloadStats();
     final fileChecks = await checkAllFilesExist();
-    
+
     for (final entry in fileChecks.entries) {
       if (entry.value) {
         stats.filesDownloaded++;
@@ -239,9 +241,9 @@ class CSVDownloadService {
         stats.filesMissing++;
       }
     }
-    
+
     stats.totalFiles = csvFiles.length;
-    
+
     return stats;
   }
 
@@ -252,29 +254,63 @@ class CSVDownloadService {
         //await _db.dropTableFactions();
         final factionsList = parsedData.cast<Faction>();
         await _db.saveFactions(factionsList);
+        await _db.debugLenTfaction();
         break;
       case 'Datasheets.csv':
         final datasheetList = parsedData.cast<Datasheet>();
         await _db.saveDatasheets(datasheetList);
+        await _db.debugLenTdatasheet();
         break;
       case 'Abilities.csv':
         //await _db.dropTableAbility();
-        await _db.debugPrintTability();
+        //await _db.debugPrintTability();
         final abilityList = parsedData.cast<Ability>();
         await _db.saveAbility(abilityList);
+        await _db.debugLenTability();
         break;
       case 'Datasheets_abilities.csv':
         //await _db.dropTableAbility();
         final datasheetAbilityList = parsedData.cast<DatasheetAbility>();
         await _db.saveDatasheetsAbility(datasheetAbilityList);
+        await _db.debugLenTdatasheetAbility();
         break;
       case 'Datasheets_models.csv':
         final datasheetsModelsList = parsedData.cast<DatasheetModel>();
         await _db.saveDatasheetsModel(datasheetsModelsList);
+        await _db.debugLenTdatasheetModel();
         break;
       case 'Enhancements.csv':
         final enhancementList = parsedData.cast<Enhancement>();
         await _db.saveEnhancement(enhancementList);
+        await _db.debugLenTenhancement();
+        break;
+      case 'Detachments.csv':
+        final detachmentList = parsedData.cast<Detachment>();
+        await _db.saveDetachment(detachmentList);
+        await _db.debugLenTdetachment();
+        break;
+      case 'Source.csv':
+        final sourcetList = parsedData.cast<Source>();
+        await _db.saveSource(sourcetList);
+        await _db.debugLenTsource();
+        break;
+      case 'Stratagems.csv':
+        final stratagemsList = parsedData.cast<Stratagem>();
+        await _db.saveStratagem(stratagemsList);
+        await _db.debugLenTstratagem();
+        break;
+      case 'Datasheets_detachment_abilities.csv':
+        final datasheetDetachmentAbilityList =
+            parsedData.cast<DatasheetDetachmentAbility>();
+        await _db
+            .saveDatasheetDetachmentAbility(datasheetDetachmentAbilityList);
+        await _db.debugLedebugLenTdatasheetDetachmentAbilitynTsource();
+        break;
+      case 'Datasheets_enhancements.csv':
+        final datasheetEnhancementList =
+            parsedData.cast<DatasheetEnhancement>();
+        await _db.saveDatasheetEnhancement(datasheetEnhancementList);
+        await _db.debugLenTdatasheetEnhancement();
         break;
     }
   }
@@ -306,10 +342,10 @@ class DownloadStats {
   int totalFiles = 0;
   int filesDownloaded = 0;
   int filesMissing = 0;
-  
+
   double get progress => totalFiles > 0 ? filesDownloaded / totalFiles : 0;
   bool get isComplete => filesDownloaded == totalFiles;
-  
+
   @override
   String toString() => 'Загружено: $filesDownloaded/$totalFiles файлов';
 }

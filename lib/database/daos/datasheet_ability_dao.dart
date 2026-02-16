@@ -6,38 +6,54 @@ import 'package:fk_army_builder/models/index.dart' as models;
 part 'datasheet_ability_dao.g.dart';
 
 @DriftAccessor(tables: [Tdatasheetability])
-class DatasheetAbilityDao extends DatabaseAccessor<AppDatabase> with _$DatasheetAbilityDaoMixin {
+class DatasheetAbilityDao extends DatabaseAccessor<AppDatabase>
+    with _$DatasheetAbilityDaoMixin {
   DatasheetAbilityDao(AppDatabase db) : super(db);
 
-  Future<List<TdatasheetabilityData>> getAll() => select(tdatasheetability).get();
-  
+  Future<List<TdatasheetabilityData>> getAll() =>
+      select(tdatasheetability).get();
+
   Future<List<TdatasheetabilityData>> getByDatasheetId(int datasheetId) =>
-      (select(tdatasheetability)..where((t) => t.datasheetId.equals(datasheetId))).get();
-  
+      (select(tdatasheetability)
+            ..where((t) => t.datasheetId.equals(datasheetId)))
+          .get();
+
   Future<List<TdatasheetabilityData>> getByAbilityId(int abilityId) =>
-      (select(tdatasheetability)..where((t) => t.abilityId.equals(abilityId))).get();
-  
+      (select(tdatasheetability)..where((t) => t.abilityId.equals(abilityId)))
+          .get();
+
   Future<void> insertAll(List<TdatasheetabilityCompanion> entries) =>
       batch((batch) {
         batch.insertAllOnConflictUpdate(tdatasheetability, entries);
       });
-  
-  Future<int> deleteByDatasheet(int datasheetId) =>
-      (delete(tdatasheetability
-      )..where((t) => t.datasheetId.equals(datasheetId))).go();
+
+  Future<int> deleteByDatasheet(int datasheetId) => (delete(tdatasheetability)
+        ..where((t) => t.datasheetId.equals(datasheetId)))
+      .go();
 
   Future<List<models.DatasheetAbility>> getAllDatasheetAbilityModels() async {
     final data = await getAllDatasheetAbilityModels();
-    return data.map((f) => models.DatasheetAbility(
-      datasheetId: f.datasheetId,
-      line: f.line,
-      abilityId: f.abilityId,
-      model: f.model,
-      name: f.name,
-      description: f.description,
-      type: f.type,
-      parameter: f.parameter,
-    )).toList();
+    return data
+        .map((f) => models.DatasheetAbility(
+              datasheetId: f.datasheetId,
+              line: f.line,
+              abilityId: f.abilityId,
+              model: f.model,
+              name: f.name,
+              description: f.description,
+              type: f.type,
+              parameter: f.parameter,
+            ))
+        .toList();
   }
 
+  Future<void> debugLenTdatasheetAbility() async {
+    final row_count =
+        await customSelect('select count(*) as count_ from tdatasheetability;')
+            .get();
+    // row.data – Map<String, dynamic>
+    for (final _row in row_count) {
+      print('DatasheetAbility count: ${_row.data['count_']} ');
+    }
+  }
 }

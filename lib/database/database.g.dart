@@ -5849,7 +5849,7 @@ class $TdatasheetenhancementTable extends Tdatasheetenhancement
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {datasheetId, enhancementId};
   @override
   TdatasheetenhancementData map(Map<String, dynamic> data,
       {String? tablePrefix}) {
@@ -6410,7 +6410,7 @@ class $TdatasheetdetachmentabilityTable extends Tdatasheetdetachmentability
       const VerificationMeta('datasheetId');
   @override
   late final GeneratedColumn<int> datasheetId = GeneratedColumn<int>(
-      'datasheet_id', aliasedName, false,
+      'datasheetId', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       defaultConstraints:
@@ -6419,7 +6419,7 @@ class $TdatasheetdetachmentabilityTable extends Tdatasheetdetachmentability
       const VerificationMeta('detachmentAbilityId');
   @override
   late final GeneratedColumn<int> detachmentAbilityId = GeneratedColumn<int>(
-      'detachment_ability_id', aliasedName, false,
+      'detachmentAbilityId', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
@@ -6437,19 +6437,19 @@ class $TdatasheetdetachmentabilityTable extends Tdatasheetdetachmentability
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('datasheet_id')) {
+    if (data.containsKey('datasheetId')) {
       context.handle(
           _datasheetIdMeta,
           datasheetId.isAcceptableOrUnknown(
-              data['datasheet_id']!, _datasheetIdMeta));
+              data['datasheetId']!, _datasheetIdMeta));
     } else if (isInserting) {
       context.missing(_datasheetIdMeta);
     }
-    if (data.containsKey('detachment_ability_id')) {
+    if (data.containsKey('detachmentAbilityId')) {
       context.handle(
           _detachmentAbilityIdMeta,
           detachmentAbilityId.isAcceptableOrUnknown(
-              data['detachment_ability_id']!, _detachmentAbilityIdMeta));
+              data['detachmentAbilityId']!, _detachmentAbilityIdMeta));
     } else if (isInserting) {
       context.missing(_detachmentAbilityIdMeta);
     }
@@ -6457,16 +6457,16 @@ class $TdatasheetdetachmentabilityTable extends Tdatasheetdetachmentability
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {datasheetId, detachmentAbilityId};
   @override
   TdatasheetdetachmentabilityData map(Map<String, dynamic> data,
       {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TdatasheetdetachmentabilityData(
       datasheetId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}datasheet_id'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}datasheetId'])!,
       detachmentAbilityId: attachedDatabase.typeMapping.read(
-          DriftSqlType.int, data['${effectivePrefix}detachment_ability_id'])!,
+          DriftSqlType.int, data['${effectivePrefix}detachmentAbilityId'])!,
     );
   }
 
@@ -6485,8 +6485,8 @@ class TdatasheetdetachmentabilityData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['datasheet_id'] = Variable<int>(datasheetId);
-    map['detachment_ability_id'] = Variable<int>(detachmentAbilityId);
+    map['datasheetId'] = Variable<int>(datasheetId);
+    map['detachmentAbilityId'] = Variable<int>(detachmentAbilityId);
     return map;
   }
 
@@ -6573,9 +6573,9 @@ class TdatasheetdetachmentabilityCompanion
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (datasheetId != null) 'datasheet_id': datasheetId,
+      if (datasheetId != null) 'datasheetId': datasheetId,
       if (detachmentAbilityId != null)
-        'detachment_ability_id': detachmentAbilityId,
+        'detachmentAbilityId': detachmentAbilityId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -6595,10 +6595,10 @@ class TdatasheetdetachmentabilityCompanion
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (datasheetId.present) {
-      map['datasheet_id'] = Variable<int>(datasheetId.value);
+      map['datasheetId'] = Variable<int>(datasheetId.value);
     }
     if (detachmentAbilityId.present) {
-      map['detachment_ability_id'] = Variable<int>(detachmentAbilityId.value);
+      map['detachmentAbilityId'] = Variable<int>(detachmentAbilityId.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -14204,7 +14204,7 @@ final class $$TdatasheetdetachmentabilityTableReferences extends BaseReferences<
           db.tdatasheetdetachmentability.datasheetId, db.tdatasheet.id));
 
   $$TdatasheetTableProcessedTableManager get datasheetId {
-    final $_column = $_itemColumn<int>('datasheet_id')!;
+    final $_column = $_itemColumn<int>('datasheetId')!;
 
     final manager = $$TdatasheetTableTableManager($_db, $_db.tdatasheet)
         .filter((f) => f.id.sqlEquals($_column));
@@ -14220,7 +14220,7 @@ final class $$TdatasheetdetachmentabilityTableReferences extends BaseReferences<
           db.tdetachmentability.id));
 
   $$TdetachmentabilityTableProcessedTableManager get detachmentAbilityId {
-    final $_column = $_itemColumn<int>('detachment_ability_id')!;
+    final $_column = $_itemColumn<int>('detachmentAbilityId')!;
 
     final manager =
         $$TdetachmentabilityTableTableManager($_db, $_db.tdetachmentability)

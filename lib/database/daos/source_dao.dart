@@ -11,33 +11,43 @@ class SourceDao extends DatabaseAccessor<AppDatabase> with _$SourceDaoMixin {
 
   // CRUD
   Future<List<TsourceData>> getAllSources() => select(tsource).get();
-  
+
   Future<TsourceData?> getSourceById(int id) =>
       (select(tsource)..where((t) => t.id.equals(id))).getSingleOrNull();
-  
+
   Future<int> insertSource(TsourceCompanion source) =>
       into(tsource).insert(source);
-  
+
   Future<void> insertAllSources(List<TsourceCompanion> sourcesList) =>
       batch((batch) {
         batch.insertAllOnConflictUpdate(tsource, sourcesList);
       });
-  
+
   Future<int> deleteSource(int id) =>
       (delete(tsource)..where((t) => t.id.equals(id))).go();
 
   // Конвертация в модели
   Future<List<models.Source>> getAllSourceModels() async {
     final data = await getAllSources();
-    return data.map((s) => models.Source(
-      id: s.id,
-      name: s.name,
-      type: s.type,
-      edition: s.edition,
-      version: s.version,
-      errataDate: s.errataDate,
-      errataLink: s.errataLink,
-    )).toList();
+    return data
+        .map((s) => models.Source(
+              id: s.id,
+              name: s.name,
+              type: s.type,
+              edition: s.edition,
+              version: s.version,
+              errataDate: s.errataDate,
+              errataLink: s.errataLink,
+            ))
+        .toList();
   }
 
+  Future<void> debugLenTsource() async {
+    final row_count =
+        await customSelect('select count(*) as count_ from tsource;').get();
+    // row.data – Map<String, dynamic>
+    for (final _row in row_count) {
+      print('tsource count: ${_row.data['count_']} ');
+    }
+  }
 }
