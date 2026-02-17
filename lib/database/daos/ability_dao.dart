@@ -7,7 +7,7 @@ part 'ability_dao.g.dart';
 
 @DriftAccessor(tables: [Tability])
 class AbilityDao extends DatabaseAccessor<AppDatabase> with _$AbilityDaoMixin {
-  AbilityDao(AppDatabase db) : super(db);
+  AbilityDao(super.db);
 
   // CRUD
   Future<List<TabilityData>> getAllAbilities() => select(tability).get();
@@ -38,10 +38,10 @@ class AbilityDao extends DatabaseAccessor<AppDatabase> with _$AbilityDaoMixin {
       // row.data – Map<String, dynamic>
       print('col: ${row.data['name']} | type: ${row.data['type']}');
     }*/
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tability;').get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('Ability count: ${_row.data['count_']} ');
     }
   }

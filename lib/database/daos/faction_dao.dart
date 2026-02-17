@@ -50,10 +50,10 @@ class FactionDao extends DatabaseAccessor<AppDatabase> with _$FactionDaoMixin {
   }
 
   Future<void> debugLenTfaction() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tfaction;').get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('tfaction count: ${_row.data['count_']} ');
     }
   }

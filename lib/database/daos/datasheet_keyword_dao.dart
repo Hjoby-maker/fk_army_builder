@@ -8,7 +8,7 @@ part 'datasheet_keyword_dao.g.dart';
 @DriftAccessor(tables: [Tdatasheetkeyword])
 class DatasheetKeywordDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetKeywordDaoMixin {
-  DatasheetKeywordDao(AppDatabase db) : super(db);
+  DatasheetKeywordDao(super.db);
 
   // CRUD
   Future<List<TdatasheetkeywordData>> getAllKeywords() =>
@@ -52,11 +52,11 @@ class DatasheetKeywordDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdatasheetKeyword() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tdatasheetkeyword;')
             .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('TdatasheetKeyword count: ${_row.data['count_']} ');
     }
   }

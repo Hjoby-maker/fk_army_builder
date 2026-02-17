@@ -8,7 +8,7 @@ part 'datasheet_detachment_ability_dao.g.dart';
 @DriftAccessor(tables: [Tdatasheetdetachmentability])
 class DatasheetDetachmentAbilityDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetDetachmentAbilityDaoMixin {
-  DatasheetDetachmentAbilityDao(AppDatabase db) : super(db);
+  DatasheetDetachmentAbilityDao(super.db);
 
   // CRUD
   Future<List<TdatasheetdetachmentabilityData>> getAll() =>
@@ -48,11 +48,11 @@ class DatasheetDetachmentAbilityDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdatasheetDetachmentAbility() async {
-    final row_count = await customSelect(
+    final rowCount = await customSelect(
             'select count(*) as count_ from tdatasheetdetachmentability;')
         .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('TdatasheetDetachmentAbility count: ${_row.data['count_']} ');
     }
   }

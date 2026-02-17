@@ -8,7 +8,7 @@ part 'datasheet_wargear_dao.g.dart';
 @DriftAccessor(tables: [Tdatasheetwargear])
 class DatasheetWargearDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetWargearDaoMixin {
-  DatasheetWargearDao(AppDatabase db) : super(db);
+  DatasheetWargearDao(super.db);
 
   // CRUD
   Future<List<TdatasheetwargearData>> getAllWargear() =>
@@ -64,11 +64,11 @@ class DatasheetWargearDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdatasheetWargear() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tdatasheetwargear;')
             .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('TdatasheetWargear count: ${_row.data['count_']} ');
     }
   }

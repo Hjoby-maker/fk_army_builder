@@ -8,7 +8,7 @@ part 'enhancement_dao.g.dart';
 @DriftAccessor(tables: [Tenhancement])
 class EnhancementDao extends DatabaseAccessor<AppDatabase>
     with _$EnhancementDaoMixin {
-  EnhancementDao(AppDatabase db) : super(db);
+  EnhancementDao(super.db);
 
   // CRUD
   Future<List<TenhancementData>> getAllEnhancements() =>
@@ -56,11 +56,11 @@ class EnhancementDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTenhancement() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tenhancement;')
             .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('tenhancement count: ${_row.data['count_']} ');
     }
   }

@@ -8,7 +8,7 @@ part 'last_update_dao.g.dart';
 @DriftAccessor(tables: [Tlastupdate])
 class LastUpdateDao extends DatabaseAccessor<AppDatabase>
     with _$LastUpdateDaoMixin {
-  LastUpdateDao(AppDatabase db) : super(db);
+  LastUpdateDao(super.db);
 
   // CRUD
   Future<List<TlastupdateData>> getAllLastUpdates() =>
@@ -42,10 +42,10 @@ class LastUpdateDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTlastUpdate() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tlastupdate;').get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('tlastupdate count: ${_row.data['count_']} ');
     }
   }

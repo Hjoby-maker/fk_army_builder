@@ -8,7 +8,7 @@ part 'datasheet_leader_dao.g.dart';
 @DriftAccessor(tables: [Tdatasheetleader])
 class DatasheetLeaderDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetLeaderDaoMixin {
-  DatasheetLeaderDao(AppDatabase db) : super(db);
+  DatasheetLeaderDao(super.db);
 
   // CRUD
   Future<List<TdatasheetleaderData>> getAllLeaders() =>
@@ -43,11 +43,11 @@ class DatasheetLeaderDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdatasheetLeader() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tdatasheetleader;')
             .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('tdatasheetleader count: ${_row.data['count_']} ');
     }
   }

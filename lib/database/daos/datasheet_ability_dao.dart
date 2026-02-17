@@ -8,7 +8,7 @@ part 'datasheet_ability_dao.g.dart';
 @DriftAccessor(tables: [Tdatasheetability])
 class DatasheetAbilityDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetAbilityDaoMixin {
-  DatasheetAbilityDao(AppDatabase db) : super(db);
+  DatasheetAbilityDao(super.db);
 
   Future<List<TdatasheetabilityData>> getAll() =>
       select(tdatasheetability).get();
@@ -48,11 +48,11 @@ class DatasheetAbilityDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdatasheetAbility() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tdatasheetability;')
             .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('DatasheetAbility count: ${_row.data['count_']} ');
     }
   }

@@ -12,7 +12,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _lastUpdateDate = 'Не загружалось';
   final String _appVersion = '1.0.0';
   final String _rulesVersion = '10th Edition';
-  
+
   @override
   void initState() {
     super.initState();
@@ -22,28 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadLastUpdateDate() async {
     final prefs = await SharedPreferences.getInstance();
     final savedDate = prefs.getString('last_update_date');
-    
+
     if (savedDate != null) {
       setState(() {
         _lastUpdateDate = savedDate;
       });
     }
-  }
-
-  Future<void> _saveUpdateDate() async {
-    final now = DateTime.now();
-    final formattedDate = '${now.day}.${now.month}.${now.year} ${now.hour}:${now.minute}';
-    
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('last_update_date', formattedDate);
-    
-    setState(() {
-      _lastUpdateDate = formattedDate;
-    });
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Дата обновления сохранена')),
-    );
   }
 
   @override
@@ -55,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF1a237e),
-              Color(0xFF283593),
-              Color(0xFF3949ab),
+              Color(0xFF473B15),
+              Color.fromARGB(255, 132, 105, 17),
+              Color.fromARGB(255, 171, 133, 7),
             ],
           ),
         ),
@@ -66,17 +50,17 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Заголовок приложения
               _buildAppHeader(),
-              
-              // Информационная карточка
+
+              // Информационная карточка с датой обновления
               _buildInfoCard(),
-              
-              // Основные действия
+
+              // Кнопки действий
               Expanded(
-                child: _buildActionGrid(),
+                child: _buildActionButtons(),
               ),
-              
-              // Нижняя панель
-              _buildBottomBar(),
+
+              // Нижняя панель навигации
+              _buildBottomNavBar(),
             ],
           ),
         ),
@@ -86,47 +70,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildAppHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-      child: Column(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      child: const Column(
         children: [
-          // Логотип
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(40),
-              border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
-            ),
-            child: const Icon(
-              Icons.military_tech,
-              size: 40,
-              color: Colors.white,
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Название приложения
-          const Text(
-            'Warhammer 40k\nArmy Builder',
-            textAlign: TextAlign.center,
+          Text(
+            'Army roster creator',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: Colors.white,
-              height: 1.2,
+              letterSpacing: 1,
             ),
           ),
-          
-          const SizedBox(height: 8),
-          
-          // Версия приложения
+          SizedBox(height: 4),
           Text(
-            'Версия $_appVersion',
+            '10th Edition',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'update: 17.02.2026',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.amber,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -136,235 +107,211 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildInfoCard() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withOpacity(0.2)),
       ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.update,
+              color: Colors.greenAccent,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Последнее обновление',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                  ),
+                ),
+                Text(
+                  _lastUpdateDate,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          /*TextButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/download');
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue.withOpacity(0.3),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.refresh, size: 16),
+                SizedBox(width: 4),
+                Text('Обновить'),
+              ],
+            ),
+          ),*/
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Container(
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Редакция правил
-          _buildInfoRow(
-            icon: Icons.book,
-            title: 'Редакция правил:',
-            value: _rulesVersion,
-            color: Colors.amber,
+          // New army list - прямоугольная кнопка
+          _buildRectangularButton(
+            title: 'New army list',
+            icon: Icons.add_circle_outline,
+            color: const Color.fromARGB(255, 42, 21, 3),
+            onTap: () {
+              Navigator.pushNamed(context, '/builder');
+            },
           ),
-          
-          const Divider(color: Colors.white30, height: 20),
-          
-          // Последнее обновление
-          _buildInfoRow(
-            icon: Icons.update,
-            title: 'Последняя загрузка:',
-            value: _lastUpdateDate,
-            color: Colors.greenAccent,
-          ),
-          
+
           const SizedBox(height: 12),
-          
-          // Кнопка обновления
-          ElevatedButton.icon(
-            onPressed: _saveUpdateDate,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue[700],
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              minimumSize: const Size(double.infinity, 44),
+
+          // My army lists - прямоугольная кнопка
+          _buildRectangularButton(
+            title: 'My army lists',
+            icon: Icons.folder_outlined,
+            color: const Color.fromARGB(255, 42, 21, 3),
+            onTap: () {
+              Navigator.pushNamed(context, '/saved');
+            },
+          ),
+
+          const SizedBox(height: 12),
+
+          // My tournament - прямоугольная кнопка
+          _buildRectangularButton(
+            title: 'My tournament',
+            icon: Icons.emoji_events_outlined,
+            color: const Color.fromARGB(255, 42, 21, 3),
+            onTap: () {
+              Navigator.pushNamed(context, '/tournament');
+            },
+          ),
+
+          const Spacer(),
+
+          // Дополнительная информация или место для рекламы
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(8),
             ),
-            icon: const Icon(Icons.refresh, size: 20),
-            label: const Text('Обновить дату загрузки'),
+            child: const Text(
+              'Select an option to begin building your army',
+              style: TextStyle(
+                color: Colors.white60,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow({
-    required IconData icon,
+  Widget _buildRectangularButton({
     required String title,
-    required String value,
-    required Color color,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white.withOpacity(0.7),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionGrid() {
-    return GridView.count(
-      padding: const EdgeInsets.all(16),
-      crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 0.9,
-      children: [
-        // Загрузка файлов
-        _buildActionCard(
-          title: 'Загрузка файлов',
-          subtitle: 'Обновление данных из сети',
-          icon: Icons.cloud_download,
-          color: Colors.blue,
-          onTap: () {
-            Navigator.pushNamed(context, '/download');
-          },
-        ),
-        
-        // Рабочий экран
-        _buildActionCard(
-          title: 'Конструктор армий',
-          subtitle: 'Создание списков армий',
-          icon: Icons.build,
-          color: Colors.green,
-          onTap: () {
-            Navigator.pushNamed(context, '/builder');
-          },
-        ),
-        
-        // Сохраненные работы
-        _buildActionCard(
-          title: 'Сохраненные армии',
-          subtitle: 'Мои списки армий',
-          icon: Icons.folder,
-          color: Colors.orange,
-          onTap: () {
-            Navigator.pushNamed(context, '/saved');
-          },
-        ),
-        
-        // Настройки
-        _buildActionCard(
-          title: 'Настройки',
-          subtitle: 'Параметры приложения',
-          icon: Icons.settings,
-          color: Colors.purple,
-          onTap: () {
-            Navigator.pushNamed(context, '/settings');
-          },
-        ),
-        
-        // Просмотр фракций
-        _buildActionCard(
-          title: 'Фракции',
-          subtitle: 'Список всех фракций',
-          icon: Icons.list,
-          color: Colors.red,
-          onTap: () {
-            Navigator.pushNamed(context, '/factions');
-          },
-        ),
-        
-        // Справка
-        _buildActionCard(
-          title: 'Справка',
-          subtitle: 'Инструкция и помощь',
-          icon: Icons.help,
-          color: Colors.teal,
-          onTap: () {
-            Navigator.pushNamed(context, '/help');
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionCard({
-    required String title,
-    required String subtitle,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
               colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.2),
+                color.withOpacity(1),
+                color.withOpacity(0.5),
               ],
             ),
+            border: Border.all(
+              color: color.withOpacity(0.5),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
               // Иконка
               Container(
-                width: 50,
-                height: 50,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: color, size: 28),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // Заголовок
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: color.withOpacity(0.9),
+                child: Icon(
+                  icon,
+                  color: Colors.amber,
+                  size: 26,
                 ),
               ),
-              
-              const SizedBox(height: 4),
-              
-              // Подзаголовок
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
+
+              const SizedBox(width: 20),
+
+              // Текст
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.amber,
+                    //color: color.withOpacity(0.9),
+                  ),
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              ),
+
+              // Стрелка
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.orangeAccent,
+                size: 20,
               ),
             ],
           ),
@@ -373,46 +320,73 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomNavBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withOpacity(0.3),
         border: Border(
           top: BorderSide(color: Colors.white.withOpacity(0.1)),
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // Статус
-          Row(
-            children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                  color: Colors.green,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Онлайн',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
-              ),
-            ],
+          // Home
+          _buildNavItem(
+            icon: Icons.home,
+            label: 'Home',
+            isSelected: true,
+            onTap: () {},
           ),
-          
-          // Копирайт
-          const Text(
-            '© 2024 WH40k Army Builder',
+
+          // Analyze
+          _buildNavItem(
+            icon: Icons.analytics_outlined,
+            label: 'Analyze',
+            isSelected: false,
+            onTap: () {
+              Navigator.pushNamed(context, '/analyze');
+            },
+          ),
+
+          // Setting (ведет на страницу загрузки)
+          _buildNavItem(
+            icon: Icons.settings,
+            label: 'Setting',
+            isSelected: false,
+            onTap: () {
+              Navigator.pushNamed(context, '/download');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? Colors.white : Colors.white60,
+            size: 22,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
             style: TextStyle(
-              color: Colors.white60,
+              color: isSelected ? Colors.white : Colors.white60,
               fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
             ),
           ),
         ],

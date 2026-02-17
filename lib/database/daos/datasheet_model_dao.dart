@@ -8,7 +8,7 @@ part 'datasheet_model_dao.g.dart';
 @DriftAccessor(tables: [Tdatasheetmodel])
 class DatasheetModelDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetModelDaoMixin {
-  DatasheetModelDao(AppDatabase db) : super(db);
+  DatasheetModelDao(super.db);
 
   Future<List<TdatasheetmodelData>> getAll() => select(tdatasheetmodel).get();
 
@@ -43,11 +43,11 @@ class DatasheetModelDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdatasheetModel() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tdatasheetmodel;')
             .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('TdatasheetModel count: ${_row.data['count_']} ');
     }
   }

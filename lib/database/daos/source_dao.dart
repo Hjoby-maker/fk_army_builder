@@ -7,7 +7,7 @@ part 'source_dao.g.dart';
 
 @DriftAccessor(tables: [Tsource])
 class SourceDao extends DatabaseAccessor<AppDatabase> with _$SourceDaoMixin {
-  SourceDao(AppDatabase db) : super(db);
+  SourceDao(super.db);
 
   // CRUD
   Future<List<TsourceData>> getAllSources() => select(tsource).get();
@@ -43,10 +43,10 @@ class SourceDao extends DatabaseAccessor<AppDatabase> with _$SourceDaoMixin {
   }
 
   Future<void> debugLenTsource() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tsource;').get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('tsource count: ${_row.data['count_']} ');
     }
   }

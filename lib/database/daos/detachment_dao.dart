@@ -8,7 +8,7 @@ part 'detachment_dao.g.dart';
 @DriftAccessor(tables: [Tdetachment])
 class DetachmentDao extends DatabaseAccessor<AppDatabase>
     with _$DetachmentDaoMixin {
-  DetachmentDao(AppDatabase db) : super(db);
+  DetachmentDao(super.db);
 
   // CRUD
   Future<List<TdetachmentData>> getAllDetachments() =>
@@ -51,10 +51,10 @@ class DetachmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdetachment() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tdetachment;').get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('tdetachment count: ${_row.data['count_']} ');
     }
   }

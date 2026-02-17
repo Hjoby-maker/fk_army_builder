@@ -8,7 +8,7 @@ part 'datasheet_unit_composition_dao.g.dart';
 @DriftAccessor(tables: [Tdatasheetunitcomposition])
 class DatasheetUnitCompositionDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetUnitCompositionDaoMixin {
-  DatasheetUnitCompositionDao(AppDatabase db) : super(db);
+  DatasheetUnitCompositionDao(super.db);
 
   // CRUD
   Future<List<TdatasheetunitcompositionData>> getAll() =>
@@ -44,11 +44,11 @@ class DatasheetUnitCompositionDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdatasheetUnitComposition() async {
-    final row_count = await customSelect(
+    final rowCount = await customSelect(
             'select count(*) as count_ from tdatasheetunitcomposition;')
         .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('TdatasheetUnitComposition count: ${_row.data['count_']} ');
     }
   }

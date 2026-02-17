@@ -8,7 +8,7 @@ part 'datasheet_option_dao.g.dart';
 @DriftAccessor(tables: [Tdatasheetoption])
 class DatasheetOptionDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetOptionDaoMixin {
-  DatasheetOptionDao(AppDatabase db) : super(db);
+  DatasheetOptionDao(super.db);
 
   // CRUD
   Future<List<TdatasheetoptionData>> getAllOptions() =>
@@ -45,11 +45,11 @@ class DatasheetOptionDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTdatasheetOption() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tdatasheetoption;')
             .get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('Tdatasheetoption count: ${_row.data['count_']} ');
     }
   }

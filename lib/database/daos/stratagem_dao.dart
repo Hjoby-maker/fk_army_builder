@@ -8,7 +8,7 @@ part 'stratagem_dao.g.dart';
 @DriftAccessor(tables: [Tstratagem])
 class StratagemDao extends DatabaseAccessor<AppDatabase>
     with _$StratagemDaoMixin {
-  StratagemDao(AppDatabase db) : super(db);
+  StratagemDao(super.db);
 
   // CRUD
   Future<List<TstratagemData>> getAllStratagems() => select(tstratagem).get();
@@ -55,10 +55,10 @@ class StratagemDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> debugLenTstratagem() async {
-    final row_count =
+    final rowCount =
         await customSelect('select count(*) as count_ from tstratagem;').get();
     // row.data – Map<String, dynamic>
-    for (final _row in row_count) {
+    for (final _row in rowCount) {
       print('tstratagem count: ${_row.data['count_']} ');
     }
   }
