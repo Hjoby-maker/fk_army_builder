@@ -69,6 +69,33 @@ const Map<String, int> factionColors = {
   'Chaos Daemons': 0xFFE91E63, // Pink
   'Grey Knights': 0xFF607D8B, // Blue Grey
 };
+const List<List<String>> csvTable = [
+  ['Imperium', 'Imperial Agents', 'AoI'],
+  ['Imperium', 'Astra Militarum', 'AM'],
+  ['Xenos', 'Genestealer Cults', 'GC'],
+  ['Xenos', 'Necrons', 'NEC'],
+  ['Xenos', 'Aeldari', 'AE'],
+  ['Imperium', 'Adeptus Titanicus', 'TL'],
+  ['Xenos', 'Orks', 'ORK'],
+  ['Unaligned', 'Unaligned Forces', 'UN'],
+  ['Imperium', 'Grey Knights', 'GK'],
+  ['Xenos', 'T`au Empire', 'TAU'],
+  ['Xenos', 'Leagues of Votann', 'LoV'],
+  ['Imperium', 'Adeptus Mechanicus', 'AdM'],
+  ['Chaos', 'Thousand Sons', 'TS'],
+  ['Chaos', 'Death Guard', 'DG'],
+  ['Chaos', 'Emperor`s Children', 'EC'],
+  ['Chaos', 'World Eaters', 'WE'],
+  ['Chaos', 'Chaos Knights', 'QT'],
+  ['Chaos', 'Chaos Daemons', 'CD'],
+  ['Imperium', 'Imperial Knights', 'QI'],
+  ['Imperium', 'Space Marines', 'SM'],
+  ['Xenos', 'Tyranids', 'TYR'],
+  ['Imperium', 'Adeptus Custodes', 'AC'],
+  ['Imperium', 'Adepta Sororitas', 'AS'],
+  ['Chaos', 'Chaos Space Marines', 'CSM'],
+  ['Xenos', 'Drukhari', 'DRU'],
+];
 const List<String> modelObject = [
   'ability',
   'datasheetAbility',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../database/services/database_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,8 +21,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadLastUpdateDate() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedDate = prefs.getString('last_update_date');
+    final date = await DatabaseService().getLastUpdateDate();
+    //final prefs = await SharedPreferences.getInstance();
+    final savedDate = date.toString().substring(0, 10);
 
     if (savedDate != null) {
       setState(() {
@@ -119,12 +121,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.2),
+              color: const Color.fromARGB(255, 255, 105, 193).withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
               Icons.update,
-              color: Colors.greenAccent,
+              color: Color.fromARGB(255, 255, 46, 147),
               size: 20,
             ),
           ),
@@ -298,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.amber,
@@ -308,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               // Стрелка
-              Icon(
+              const Icon(
                 Icons.arrow_forward_ios,
                 color: Colors.orangeAccent,
                 size: 20,

@@ -49,4 +49,26 @@ class LastUpdateDao extends DatabaseAccessor<AppDatabase>
       print('tlastupdate count: ${_row.data['count_']} ');
     }
   }
+
+  //Получить последнюю дату как DateTime
+  Future<DateTime?> getLastUpdateDate() async {
+    final query = select(tlastupdate)
+      ..orderBy([
+        (t) => OrderingTerm(expression: t.lastUpdate, mode: OrderingMode.desc)
+      ])
+      ..limit(1);
+
+    final result = await query.getSingleOrNull();
+    return result?.lastUpdate;
+  }
+
+  //Проверить, есть ли обновления после указанной даты
+  Future<bool> hasUpdatesAfter(DateTime date) async {
+    final query = select(tlastupdate)
+      ..where((t) => t.lastUpdate.isBiggerThanValue(date))
+      ..limit(1);
+
+    final result = await query.get();
+    return result.isNotEmpty;
+  }
 }

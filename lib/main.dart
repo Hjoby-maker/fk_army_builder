@@ -10,8 +10,9 @@ Future<void> main() async {
   await appState.initialize();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AppState(),
+    ChangeNotifierProvider.value(
+      //create: (_) => AppState(),
+      value: appState,
       child: const MyApp(),
     ),
   );
@@ -23,14 +24,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
-    
+
     return MaterialApp(
-      
       title: 'Warhammer 40k Army Builder',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: appState.themeMode,
-   
+
       // Используем роутер
       onGenerateRoute: AppRouter.generateRoute,
       initialRoute: '/',
