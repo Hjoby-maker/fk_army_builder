@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 import '../database/services/database_service.dart';
+import '../globals/constants.dart';
+import '../globals/app_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,8 +14,32 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _lastUpdateDate = 'Не загружалось';
-  final String _appVersion = '1.0.0';
-  final String _rulesVersion = '10th Edition';
+  //final String _appVersion = '1.0.0';
+  //final String _rulesVersion = '10th Edition';
+
+  // Для модального окна
+  String? _selectedFactionType;
+  String? _selectedFaction;
+  final TextEditingController _armyNameController = TextEditingController();
+  final TextEditingController _pointsController = TextEditingController();
+
+  // Получаем уникальные типы фракций из csvTable
+  late final List<String> _factionTypes =
+      csvTable.map((row) => row[0]).toSet().toList();
+
+  // Карта для связи тип фракции -> список фракций
+  late final Map<String, List<String>> _factionsByType = () {
+    final map = <String, List<String>>{};
+    for (var row in csvTable) {
+      final type = row[0];
+      final faction = row[1];
+      if (!map.containsKey(type)) {
+        map[type] = [];
+      }
+      map[type]!.add(faction);
+    }
+    return map;
+  }();
 
   @override
   void initState() {
@@ -25,11 +52,335 @@ class _HomeScreenState extends State<HomeScreen> {
     //final prefs = await SharedPreferences.getInstance();
     final savedDate = date.toString().substring(0, 10);
 
-    if (savedDate != null) {
-      setState(() {
-        _lastUpdateDate = savedDate;
-      });
-    }
+    //if (savedDate != null) {
+    setState(() {
+      _lastUpdateDate = savedDate;
+    });
+    //}
+  }
+
+  @override
+  void dispose() {
+    _armyNameController.dispose(); // НОВЫЙ DISPOSE
+    _pointsController.dispose();
+    super.dispose();
+  }
+
+  void _showNewArmyDialog() {
+    // Сбрасываем значения при открытии
+    _armyNameController.clear();
+    _selectedFactionType = null;
+    _selectedFaction = null;
+    _pointsController.clear();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true, // Разрешаем закрытие по тапу вне окна
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF2D2D2D),
+              title: const Text(
+                'Создание новой армии',
+                style: TextStyle(
+                  color: Colors.amber,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Название армии:',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    TextField(
+                      controller: _armyNameController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Введите название армии',
+                        hintStyle: const TextStyle(color: Colors.white38),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.05),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Colors.amber.withOpacity(0.5),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Colors.amber.withOpacity(0.5),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                            color: Colors.amber,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    // Первый выпадающий список - тип фракции
+                    const Text(
+                      'Тип фракции:',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(color: Colors.amber.withOpacity(0.5)),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white.withOpacity(0.05),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedFactionType,
+                          isExpanded: true,
+                          hint: const Text(
+                            'Выберите тип фракции',
+                            style: TextStyle(color: Colors.white54),
+                          ),
+                          dropdownColor: const Color(0xFF1E1E1E),
+                          style: const TextStyle(color: Colors.white),
+                          icon: const Icon(Icons.arrow_drop_down,
+                              color: Colors.amber),
+                          items: _factionTypes.map((String type) {
+                            return DropdownMenuItem<String>(
+                              value: type,
+                              child: Text(type),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedFactionType = newValue;
+                              _selectedFaction =
+                                  null; // Сбрасываем выбор фракции
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Второй выпадающий список - фракция
+                    const Text(
+                      'Фракция:',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(color: Colors.amber.withOpacity(0.5)),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white.withOpacity(0.05),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedFaction,
+                          isExpanded: true,
+                          hint: Text(
+                            _selectedFactionType == null
+                                ? 'Сначала выберите тип фракции'
+                                : 'Выберите фракцию',
+                            style: const TextStyle(color: Colors.white54),
+                          ),
+                          dropdownColor: const Color(0xFF1E1E1E),
+                          style: const TextStyle(color: Colors.white),
+                          icon: const Icon(Icons.arrow_drop_down,
+                              color: Colors.amber),
+                          items: _selectedFactionType != null
+                              ? _factionsByType[_selectedFactionType]!
+                                  .map((String faction) {
+                                  return DropdownMenuItem<String>(
+                                    value: faction,
+                                    child: Text(faction),
+                                  );
+                                }).toList()
+                              : [],
+                          onChanged: _selectedFactionType != null
+                              ? (String? newValue) {
+                                  setState(() {
+                                    _selectedFaction = newValue;
+                                  });
+                                }
+                              : null,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Поле ввода очков
+                    const Text(
+                      'Максимум очков:',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    TextField(
+                      controller: _pointsController,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Например: 2000',
+                        hintStyle: const TextStyle(color: Colors.white38),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.05),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Colors.amber.withOpacity(0.5),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Colors.amber.withOpacity(0.5),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                            color: Colors.amber,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                // Кнопка Отмена
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white70,
+                    backgroundColor: Colors.grey.withOpacity(0.2),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                  ),
+                  child: const Text('Отмена'),
+                ),
+
+                // Кнопка ОК
+                ElevatedButton(
+                  onPressed: () {
+                    // Проверка заполнения полей
+                    final armyName = _armyNameController.text.trim();
+                    if (armyName.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Введите название армии'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (_selectedFactionType == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Выберите тип фракции'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (_selectedFaction == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Выберите фракцию'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    final pointsText = _pointsController.text.trim();
+                    if (pointsText.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Введите максимальное количество очков'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    final points = int.tryParse(pointsText);
+                    if (points == null || points <= 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Введите корректное число очков'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    // СОХРАНЯЕМ ПАРАМЕТРЫ В APPSTATE
+                    final appState =
+                        Provider.of<AppState>(context, listen: false);
+                    appState.setNewArmyParams(
+                      armyName: armyName,
+                      factionType: _selectedFactionType!,
+                      faction: _selectedFaction!,
+                      maxPoints: points,
+                    );
+
+                    // Все проверки пройдены - закрываем диалог и переходим на страницу билдера
+                    Navigator.of(context).pop();
+
+                    // Переходим на страницу билдера с параметрами
+                    Navigator.pushNamed(context, '/builder');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.amber,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 12),
+                  ),
+                  child: const Text('ОК'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -189,9 +540,9 @@ class _HomeScreenState extends State<HomeScreen> {
             title: 'New army list',
             icon: Icons.add_circle_outline,
             color: const Color.fromARGB(255, 42, 21, 3),
-            onTap: () {
-              Navigator.pushNamed(context, '/builder');
-            },
+            onTap: _showNewArmyDialog, //() {
+            // Navigator.pushNamed(context, '/builder');
+            //},
           ),
 
           const SizedBox(height: 12),

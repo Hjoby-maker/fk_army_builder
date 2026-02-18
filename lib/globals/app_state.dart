@@ -13,6 +13,18 @@ class AppState extends ChangeNotifier {
   bool _isInitialized = false;
   String? _initError;
 
+// Поля для текущей создаваемой армии
+  String? _currentArmyName;
+  String? _currentFactionType;
+  String? _currentFaction;
+  int? _currentMaxPoints;
+
+  // Геттеры для полей армии
+  String? get currentArmyName => _currentArmyName;
+  String? get currentFactionType => _currentFactionType;
+  String? get currentFaction => _currentFaction;
+  int? get currentMaxPoints => _currentMaxPoints;
+
 // Геттер для DatabaseService
   DatabaseService get databaseService => _db;
 // Геттер для статуса инициализации
@@ -45,6 +57,7 @@ class AppState extends ChangeNotifier {
       // но покажем ошибку пользователю
     }
   }
+
   /* Future<void> initialize() async {
     if (!_isInitialized) {
       await _db.initialize();
@@ -53,6 +66,31 @@ class AppState extends ChangeNotifier {
       print('Database initialize');
     }
   }*/
+
+  // Метод для установки параметров новой армии
+  void setNewArmyParams({
+    required String armyName,
+    required String factionType,
+    required String faction,
+    required int maxPoints,
+  }) {
+    _currentArmyName = armyName;
+    _currentFactionType = factionType;
+    _currentFaction = faction;
+    _currentMaxPoints = maxPoints;
+    notifyListeners();
+    print('Параметры армии сохранены: $armyName, $faction, $maxPoints');
+  }
+
+  // Метод для сброса параметров армии (после использования или при отмене)
+  void clearArmyParams() {
+    _currentArmyName = null;
+    _currentFactionType = null;
+    _currentFaction = null;
+    _currentMaxPoints = null;
+    notifyListeners();
+    print('Параметры армии сброшены');
+  }
 
   // Состояние приложения
   DateTime? _lastDataUpdate;

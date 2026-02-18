@@ -51,6 +51,28 @@ class DatasheetKeywordDao extends DatabaseAccessor<AppDatabase>
         .toList();
   }
 
+  // Получить уникальные ключевые слова для фракции по её имени (с JOIN)
+  Future<List<String>> getUniqueKeywordsByFactionName(
+      String factionName) async {
+    final query = '''
+    SELECT DISTINCT k.keyword
+    FROM tdatasheetkeyword k
+    JOIN tdatasheet d ON k.datasheetId = d.id
+    JOIN tfaction f ON d.factionId = f.id
+    WHERE f.name = ? AND k.keyword IS NOT NULL AND k.keyword != '' and 
+    (k.model = 'ALL MODELS' or k.model isnull)
+    and k.isFactionKeyword = FALSE
+    ORDER BY k.keyword
+  ''';
+
+    final result = await customSelect(
+      query,
+      variables: [Variable.withString(factionName)],
+    ).get();
+
+    return result.map((row) => row.data['keyword'] as String).toList();
+  }
+
   Future<void> debugLenTdatasheetKeyword() async {
     final rowCount =
         await customSelect('select count(*) as count_ from tdatasheetkeyword;')

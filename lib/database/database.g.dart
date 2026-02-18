@@ -636,7 +636,7 @@ class $TdatasheetTable extends Tdatasheet
       const VerificationMeta('factionId');
   @override
   late final GeneratedColumn<String> factionId = GeneratedColumn<String>(
-      'faction_id', aliasedName, false,
+      'factionId', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       defaultConstraints:
@@ -746,9 +746,9 @@ class $TdatasheetTable extends Tdatasheet
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('faction_id')) {
+    if (data.containsKey('factionId')) {
       context.handle(_factionIdMeta,
-          factionId.isAcceptableOrUnknown(data['faction_id']!, _factionIdMeta));
+          factionId.isAcceptableOrUnknown(data['factionId']!, _factionIdMeta));
     } else if (isInserting) {
       context.missing(_factionIdMeta);
     }
@@ -818,7 +818,7 @@ class $TdatasheetTable extends Tdatasheet
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       factionId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}faction_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}factionId'])!,
       sourceId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}source_id'])!,
       legend: attachedDatabase.typeMapping
@@ -885,7 +885,7 @@ class TdatasheetData extends DataClass implements Insertable<TdatasheetData> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    map['faction_id'] = Variable<String>(factionId);
+    map['factionId'] = Variable<String>(factionId);
     map['source_id'] = Variable<int>(sourceId);
     if (!nullToAbsent || legend != null) {
       map['legend'] = Variable<String>(legend);
@@ -1179,7 +1179,7 @@ class TdatasheetCompanion extends UpdateCompanion<TdatasheetData> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (factionId != null) 'faction_id': factionId,
+      if (factionId != null) 'factionId': factionId,
       if (sourceId != null) 'source_id': sourceId,
       if (legend != null) 'legend': legend,
       if (role != null) 'role': role,
@@ -1237,7 +1237,7 @@ class TdatasheetCompanion extends UpdateCompanion<TdatasheetData> {
       map['name'] = Variable<String>(name.value);
     }
     if (factionId.present) {
-      map['faction_id'] = Variable<String>(factionId.value);
+      map['factionId'] = Variable<String>(factionId.value);
     }
     if (sourceId.present) {
       map['source_id'] = Variable<int>(sourceId.value);
@@ -4821,7 +4821,7 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
       const VerificationMeta('datasheetId');
   @override
   late final GeneratedColumn<int> datasheetId = GeneratedColumn<int>(
-      'datasheet_id', aliasedName, false,
+      'datasheetId', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       defaultConstraints:
@@ -4863,11 +4863,11 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('datasheet_id')) {
+    if (data.containsKey('datasheetId')) {
       context.handle(
           _datasheetIdMeta,
           datasheetId.isAcceptableOrUnknown(
-              data['datasheet_id']!, _datasheetIdMeta));
+              data['datasheetId']!, _datasheetIdMeta));
     } else if (isInserting) {
       context.missing(_datasheetIdMeta);
     }
@@ -4899,7 +4899,7 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       datasheetId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}datasheet_id'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}datasheetId'])!,
       keyword: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}keyword']),
       model: attachedDatabase.typeMapping
@@ -4932,7 +4932,7 @@ class TdatasheetkeywordData extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['datasheet_id'] = Variable<int>(datasheetId);
+    map['datasheetId'] = Variable<int>(datasheetId);
     if (!nullToAbsent || keyword != null) {
       map['keyword'] = Variable<String>(keyword);
     }
@@ -5062,7 +5062,7 @@ class TdatasheetkeywordCompanion
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (datasheetId != null) 'datasheet_id': datasheetId,
+      if (datasheetId != null) 'datasheetId': datasheetId,
       if (keyword != null) 'keyword': keyword,
       if (model != null) 'model': model,
       if (isFactionKeyword != null) 'is_faction_keyword': isFactionKeyword,
@@ -5091,7 +5091,7 @@ class TdatasheetkeywordCompanion
       map['id'] = Variable<int>(id.value);
     }
     if (datasheetId.present) {
-      map['datasheet_id'] = Variable<int>(datasheetId.value);
+      map['datasheetId'] = Variable<int>(datasheetId.value);
     }
     if (keyword.present) {
       map['keyword'] = Variable<String>(keyword.value);
@@ -8097,7 +8097,7 @@ final class $$TdatasheetTableReferences
           $_aliasNameGenerator(db.tdatasheet.factionId, db.tfaction.id));
 
   $$TfactionTableProcessedTableManager get factionId {
-    final $_column = $_itemColumn<String>('faction_id')!;
+    final $_column = $_itemColumn<String>('factionId')!;
 
     final manager = $$TfactionTableTableManager($_db, $_db.tfaction)
         .filter((f) => f.id.sqlEquals($_column));
@@ -12290,7 +12290,7 @@ final class $$TdatasheetkeywordTableReferences extends BaseReferences<
           db.tdatasheetkeyword.datasheetId, db.tdatasheet.id));
 
   $$TdatasheetTableProcessedTableManager get datasheetId {
-    final $_column = $_itemColumn<int>('datasheet_id')!;
+    final $_column = $_itemColumn<int>('datasheetId')!;
 
     final manager = $$TdatasheetTableTableManager($_db, $_db.tdatasheet)
         .filter((f) => f.id.sqlEquals($_column));

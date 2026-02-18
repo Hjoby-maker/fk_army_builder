@@ -5,7 +5,8 @@ import 'tSource.dart';
 class Tdatasheet extends Table {
   IntColumn get id => integer()();
   TextColumn get name => text().withLength(min: 1, max: 200)();
-  TextColumn get factionId => text().references(Tfaction, #id)();
+  TextColumn get factionId =>
+      text().references(Tfaction, #id).named('factionId')();
   IntColumn get sourceId => integer().references(Tsource, #id)();
   TextColumn get legend => text().nullable()();
   TextColumn get role => text().nullable()();

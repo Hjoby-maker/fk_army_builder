@@ -4,7 +4,8 @@ import 'tIndex.dart';
 
 class Tdatasheetkeyword extends Table {
   IntColumn get id => integer().autoIncrement()(); // автоинкрементный ID
-  IntColumn get datasheetId => integer().references(Tdatasheet, #id)();
+  IntColumn get datasheetId =>
+      integer().references(Tdatasheet, #id).named('datasheetId')();
   TextColumn get keyword => text().nullable()();
   TextColumn get model => text().nullable()();
   @BoolIntConverter()
