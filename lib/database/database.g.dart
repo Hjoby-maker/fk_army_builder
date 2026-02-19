@@ -7227,6 +7227,26 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final LastUpdateDao lastUpdateDao = LastUpdateDao(this as AppDatabase);
   late final SourceDao sourceDao = SourceDao(this as AppDatabase);
   late final StratagemDao stratagemDao = StratagemDao(this as AppDatabase);
+  late final DatasheetWargearDao datasheetWargearDao =
+      DatasheetWargearDao(this as AppDatabase);
+  late final DatasheetKeywordDao datasheetKeywordDao =
+      DatasheetKeywordDao(this as AppDatabase);
+  late final DatasheetOptionDao datasheetOptionDao =
+      DatasheetOptionDao(this as AppDatabase);
+  late final DatasheetLeaderDao datasheetLeaderDao =
+      DatasheetLeaderDao(this as AppDatabase);
+  late final DatasheetStratagemDao datasheetStratagemDao =
+      DatasheetStratagemDao(this as AppDatabase);
+  late final DatasheetEnhancementDao datasheetEnhancementDao =
+      DatasheetEnhancementDao(this as AppDatabase);
+  late final DatasheetDetachmentAbilityDao datasheetDetachmentAbilityDao =
+      DatasheetDetachmentAbilityDao(this as AppDatabase);
+  late final DatasheetUnitCompositionDao datasheetUnitCompositionDao =
+      DatasheetUnitCompositionDao(this as AppDatabase);
+  late final DatasheetModelCostDao datasheetModelCostDao =
+      DatasheetModelCostDao(this as AppDatabase);
+  late final DetachmentAbilityDao detachmentAbilityDao =
+      DetachmentAbilityDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

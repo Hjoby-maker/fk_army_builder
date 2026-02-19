@@ -30,6 +30,7 @@ part 'database.g.dart';
     Tdatasheetdetachmentability,
     Tdatasheetunitcomposition,
     Tdatasheetmodelcost,
+    Tdetachmentability,
   ],
   daos: [
     FactionDao,
@@ -42,6 +43,16 @@ part 'database.g.dart';
     LastUpdateDao,
     SourceDao,
     StratagemDao,
+    DatasheetWargearDao,
+    DatasheetKeywordDao,
+    DatasheetOptionDao,
+    DatasheetLeaderDao,
+    DatasheetStratagemDao,
+    DatasheetEnhancementDao,
+    DatasheetDetachmentAbilityDao,
+    DatasheetUnitCompositionDao,
+    DatasheetModelCostDao,
+    DetachmentAbilityDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
