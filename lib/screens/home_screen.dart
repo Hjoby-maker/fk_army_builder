@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../database/services/database_service.dart';
 import '../globals/constants.dart';
 import '../globals/app_state.dart';
+import '../screens/widgets/bottom_nav_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -674,76 +675,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBottomNavBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
-        border: Border(
-          top: BorderSide(color: Colors.white.withOpacity(0.1)),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          // Home
-          _buildNavItem(
-            icon: Icons.home,
-            label: 'Home',
-            isSelected: true,
-            onTap: () {},
-          ),
-
-          // Analyze
-          _buildNavItem(
-            icon: Icons.analytics_outlined,
-            label: 'Analyze',
-            isSelected: false,
-            onTap: () {
-              Navigator.pushNamed(context, '/analyze');
-            },
-          ),
-
-          // Setting (ведет на страницу загрузки)
-          _buildNavItem(
-            icon: Icons.settings,
-            label: 'Setting',
-            isSelected: false,
-            onTap: () {
-              Navigator.pushNamed(context, '/download');
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? Colors.white : Colors.white60,
-            size: 22,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white60,
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
+    return BottomNavBar(
+      selectedIndex: 0, // Home выбран
+      onItemTapped: (index) {
+        switch (index) {
+          case 0: // Home
+            // Уже на home, ничего не делаем
+            break;
+          case 1: // Analyze
+            Navigator.pushNamed(context, '/analyze');
+            break;
+          case 2: // Setting
+            Navigator.pushNamed(context, '/download');
+            break;
+        }
+      },
     );
   }
 }

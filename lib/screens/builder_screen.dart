@@ -2,25 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../globals/app_state.dart';
 import '../database/services/database_service.dart';
+import '../screens/widgets/collapsible_section.dart';
+import '../screens/widgets/bottom_nav_bar.dart';
 
-class BuilderScreen extends StatelessWidget {
+class BuilderScreen extends StatefulWidget {
   const BuilderScreen({super.key});
 
-  Future<void> _printUniqueKeywords(String factionName) async {
-    print('========== КЛЮЧЕВЫЕ СЛОВА ДЛЯ ФРАКЦИИ: $factionName ==========');
-    final keywords =
-        await DatabaseService().getUniqueKeywordsByFactionName(factionName);
-    if (keywords.isEmpty) {
-      print('Ключевые слова не найдены для фракции "$factionName"');
-      return;
-    }
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  @override
+  State<BuilderScreen> createState() => _BuilderScreenState();
+}
 
-    for (var i = 0; i < keywords.length; i++) {
-      print('${i + 1}. ${keywords[i]}');
-    }
-
-    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+class _BuilderScreenState extends State<BuilderScreen> {
+  int _selectedNavIndex = 0; // По умолчанию Home
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -32,13 +28,6 @@ class BuilderScreen extends StatelessWidget {
     final factionType = appState.currentFactionType!;
     final faction = appState.currentFaction!;
     final maxPoints = appState.currentMaxPoints!;
-
-    // Вызываем запрос при построении экрана
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _printUniqueKeywords(faction);
-      // Для более детальной информации:
-      // _printKeywordsWithDetails(faction);
-    });
 
     return Scaffold(
       appBar: AppBar(
@@ -57,65 +46,221 @@ class BuilderScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: Center(
-          child: Card(
-            margin: const EdgeInsets.all(16),
-            color: Colors.white.withOpacity(0.1),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            // Блок с информацией об армии (опционально)
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.black12,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Новая армия создана!',
-                    style: TextStyle(
-                      fontSize: 24,
+                  Text(
+                    armyName,
+                    style: const TextStyle(
+                      fontSize: 20,
                       color: Colors.amber,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  _buildInfoRow('Название:', armyName), // НОВАЯ СТРОКА
-                  _buildInfoRow('Тип фракции:', factionType),
-                  _buildInfoRow('Фракция:', faction),
-                  _buildInfoRow('Макс. очков:', maxPoints.toString()),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      foregroundColor: Colors.black,
-                    ),
-                    child: const Text('Назад'),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildInfoChip('Фракция', faction),
+                      const SizedBox(width: 8),
+                      _buildInfoChip('Очки', '$maxPoints'),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
+            // 7 сворачиваемых секций
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                children: [
+                  // Секция 1: Лидеры / Герои
+                  CollapsibleSection(
+                    title: 'EPIC HERO',
+                    itemCount: 0, // Замените на реальное количество
+                    onAddPressed: () {
+                      // Логика добавления эпического героя
+                      print('Добавить эпического героя');
+                      // Здесь можно показать диалог выбора или перейти на другой экран
+                    },
+                    children: [
+                      // Сюда будут добавляться виджеты позже
+                      const Text(
+                        'Нажмите "+" чтобы добавить единицу',
+                        style: TextStyle(
+                            color: Colors.white70, fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+
+                  // Секция 2: Элита
+                  CollapsibleSection(
+                    title: 'Characters',
+                    itemCount: 0,
+                    onAddPressed: () {
+                      // Логика добавления эпического героя
+                      print('Добавить эпического героя');
+                      // Здесь можно показать диалог выбора или перейти на другой экран
+                    },
+                    children: [
+                      const Text(
+                        'Нажмите "+" чтобы добавить единицу',
+                        style: TextStyle(
+                            color: Colors.white70, fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+
+                  // Секция 3: Бойцы
+                  CollapsibleSection(
+                    title: 'Battleline',
+                    itemCount: 0,
+                    onAddPressed: () {
+                      // Логика добавления эпического героя
+                      print('Добавить эпического героя');
+                      // Здесь можно показать диалог выбора или перейти на другой экран
+                    },
+                    children: [
+                      const Text(
+                        'Нажмите "+" чтобы добавить единицу',
+                        style: TextStyle(
+                            color: Colors.white70, fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+
+                  // Секция 4: Поддержка
+                  CollapsibleSection(
+                    title: 'Dedicated Transports',
+                    itemCount: 0,
+                    onAddPressed: () {
+                      // Логика добавления эпического героя
+                      print('Добавить эпического героя');
+                      // Здесь можно показать диалог выбора или перейти на другой экран
+                    },
+                    children: [
+                      const Text(
+                        'Нажмите "+" чтобы добавить единицу',
+                        style: TextStyle(
+                            color: Colors.white70, fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+
+                  // Секция 5: Транспорт
+                  CollapsibleSection(
+                    title: 'Other',
+                    itemCount: 0,
+                    onAddPressed: () {
+                      // Логика добавления эпического героя
+                      print('Добавить эпического героя');
+                      // Здесь можно показать диалог выбора или перейти на другой экран
+                    },
+                    children: [
+                      const Text(
+                        'Нажмите "+" чтобы добавить единицу',
+                        style: TextStyle(
+                            color: Colors.white70, fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+
+                  // Секция 6: Укрепления
+                  CollapsibleSection(
+                    title: 'Fortifications',
+                    itemCount: 0,
+                    onAddPressed: () {
+                      // Логика добавления эпического героя
+                      print('Добавить эпического героя');
+                      // Здесь можно показать диалог выбора или перейти на другой экран
+                    },
+                    children: [
+                      const Text(
+                        'Нажмите "+" чтобы добавить единицу',
+                        style: TextStyle(
+                            color: Colors.white70, fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+
+                  // Секция 7: Альянсы / Дополнительные
+                  CollapsibleSection(
+                    title: 'Starred',
+                    itemCount: 0,
+                    onAddPressed: () {
+                      // Логика добавления эпического героя
+                      print('Добавить эпического героя');
+                      // Здесь можно показать диалог выбора или перейти на другой экран
+                    },
+                    children: [
+                      const Text(
+                        'Нажмите "+" чтобы добавить единицу',
+                        style: TextStyle(
+                            color: Colors.white70, fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            _buildBottomNavBar(),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+  // Замените _buildBottomNavBar на:
+  Widget _buildBottomNavBar() {
+    return BottomNavBar(
+      selectedIndex: _selectedNavIndex,
+      onItemTapped: (index) {
+        setState(() {
+          _selectedNavIndex = index;
+        });
+
+        switch (index) {
+          case 0: // Home
+            Navigator.pushNamed(context, '/');
+            break;
+          case 1: // Analyze
+            Navigator.pushNamed(context, '/analyze');
+            break;
+          case 2: // Setting
+            Navigator.pushNamed(context, '/download');
+            break;
+        }
+      },
+    );
+  }
+
+// Вспомогательный метод для чипсов информации
+  Widget _buildInfoChip(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.amber.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.amber.withOpacity(0.5)),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
-            ),
+            '$label: ',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           Text(
             value,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 16,
               fontWeight: FontWeight.bold,
+              fontSize: 14,
             ),
           ),
         ],

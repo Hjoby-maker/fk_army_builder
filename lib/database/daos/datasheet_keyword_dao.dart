@@ -61,7 +61,8 @@ class DatasheetKeywordDao extends DatabaseAccessor<AppDatabase>
     JOIN tfaction f ON d.factionId = f.id
     WHERE f.name = ? AND k.keyword IS NOT NULL AND k.keyword != '' and 
     (k.model = 'ALL MODELS' or k.model isnull)
-    and k.isFactionKeyword = FALSE
+    and k.isFactionKeyword = 0
+    and d.name != k.keyword
     ORDER BY k.keyword
   ''';
 

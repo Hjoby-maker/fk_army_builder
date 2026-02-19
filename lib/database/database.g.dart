@@ -4841,11 +4841,11 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
       const VerificationMeta('isFactionKeyword');
   @override
   late final GeneratedColumn<bool> isFactionKeyword = GeneratedColumn<bool>(
-      'is_faction_keyword', aliasedName, false,
+      'isFactionKeyword', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("is_faction_keyword" IN (0, 1))'));
+          'CHECK ("isFactionKeyword" IN (0, 1))'));
   @override
   List<GeneratedColumn> get $columns =>
       [id, datasheetId, keyword, model, isFactionKeyword];
@@ -4879,11 +4879,11 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
       context.handle(
           _modelMeta, model.isAcceptableOrUnknown(data['model']!, _modelMeta));
     }
-    if (data.containsKey('is_faction_keyword')) {
+    if (data.containsKey('isFactionKeyword')) {
       context.handle(
           _isFactionKeywordMeta,
           isFactionKeyword.isAcceptableOrUnknown(
-              data['is_faction_keyword']!, _isFactionKeywordMeta));
+              data['isFactionKeyword']!, _isFactionKeywordMeta));
     } else if (isInserting) {
       context.missing(_isFactionKeywordMeta);
     }
@@ -4904,8 +4904,8 @@ class $TdatasheetkeywordTable extends Tdatasheetkeyword
           .read(DriftSqlType.string, data['${effectivePrefix}keyword']),
       model: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}model']),
-      isFactionKeyword: attachedDatabase.typeMapping.read(
-          DriftSqlType.bool, data['${effectivePrefix}is_faction_keyword'])!,
+      isFactionKeyword: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}isFactionKeyword'])!,
     );
   }
 
@@ -4939,7 +4939,7 @@ class TdatasheetkeywordData extends DataClass
     if (!nullToAbsent || model != null) {
       map['model'] = Variable<String>(model);
     }
-    map['is_faction_keyword'] = Variable<bool>(isFactionKeyword);
+    map['isFactionKeyword'] = Variable<bool>(isFactionKeyword);
     return map;
   }
 
@@ -5065,7 +5065,7 @@ class TdatasheetkeywordCompanion
       if (datasheetId != null) 'datasheetId': datasheetId,
       if (keyword != null) 'keyword': keyword,
       if (model != null) 'model': model,
-      if (isFactionKeyword != null) 'is_faction_keyword': isFactionKeyword,
+      if (isFactionKeyword != null) 'isFactionKeyword': isFactionKeyword,
     });
   }
 
@@ -5100,7 +5100,7 @@ class TdatasheetkeywordCompanion
       map['model'] = Variable<String>(model.value);
     }
     if (isFactionKeyword.present) {
-      map['is_faction_keyword'] = Variable<bool>(isFactionKeyword.value);
+      map['isFactionKeyword'] = Variable<bool>(isFactionKeyword.value);
     }
     return map;
   }

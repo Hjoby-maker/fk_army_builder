@@ -9,7 +9,7 @@ class Tdatasheetkeyword extends Table {
   TextColumn get keyword => text().nullable()();
   TextColumn get model => text().nullable()();
   @BoolIntConverter()
-  BoolColumn get isFactionKeyword => boolean()();
+  BoolColumn get isFactionKeyword => boolean().named('isFactionKeyword')();
 
   @override
   Set<Column> get primaryKey => {id};
