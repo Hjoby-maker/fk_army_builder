@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../globals/app_state.dart';
-import '../database/services/database_service.dart';
 import '../screens/widgets/collapsible_section.dart';
 import '../screens/widgets/bottom_nav_bar.dart';
 
@@ -25,7 +24,6 @@ class _BuilderScreenState extends State<BuilderScreen> {
 
     // Получаем значения из AppState
     final armyName = appState.currentArmyName!;
-    final factionType = appState.currentFactionType!;
     final faction = appState.currentFaction!;
     final maxPoints = appState.currentMaxPoints!;
 

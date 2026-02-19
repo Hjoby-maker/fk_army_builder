@@ -338,26 +338,6 @@ class DatabaseService {
     return datasheetKeywordDao.insertAllKeywords(companions);
   }
 
-  // Получить уникальные ключевые слова для фракции по её имени
-  Future<List<String>> getUniqueKeywordsByFactionName(
-      String factionName) async {
-    _checkInitialized();
-    try {
-      print('Получение ключевых слов для фракции: $factionName');
-
-      // Используем существующий DAO с новым методом
-      final keywords = await _datasheetKeywordDao!
-          .getUniqueKeywordsByFactionName(factionName);
-
-      print('Найдено ключевых слов: ${keywords.length}');
-      return keywords;
-    } catch (e, stack) {
-      print('Ошибка при получении ключевых слов для фракции $factionName: $e');
-      print(stack);
-      return []; // Возвращаем пустой список в случае ошибки
-    }
-  }
-
   Future debugLenTdatasheetKeyword() =>
       datasheetKeywordDao.debugLenTdatasheetKeyword();
   //===========================================================================
