@@ -17,7 +17,7 @@ abstract class DbDependentService {
       _dbService.database;
     } catch (e) {
       throw StateError(
-        'DatabaseService должен быть инициализирован перед использованием ${runtimeType}. '
+        'DatabaseService должен быть инициализирован перед использованием $runtimeType. '
         'Вызовите DatabaseService().initialize() в main().',
       );
     }
