@@ -6,6 +6,7 @@ import '../screens/widgets/collapsible_section.dart';
 import '../screens/widgets/unit_list_item.dart';
 import '../screens/widgets/unit_selection_dialog.dart';
 import '../screens/widgets/unit_detail_popup.dart';
+import '../screens/widgets/bottom_nav_bar.dart';
 
 class BuilderScreen extends StatefulWidget {
   const BuilderScreen({super.key});
@@ -15,6 +16,26 @@ class BuilderScreen extends StatefulWidget {
 }
 
 class _BuilderScreenState extends State<BuilderScreen> {
+  int _selectedIndex = 1; // 1 = Builder/Analyze по умолчанию
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Логика навигации
+    switch (index) {
+      case 0: // Home
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 1: // Analyze/Builder - остаёмся на экране
+        break;
+      case 2: // Settings
+        Navigator.pushNamed(context, '/settings');
+        break;
+    }
+  }
+
   // Данные для каждой из 7 секций
   final Map<String, Set<int>> _selectedUnits = {
     'Лидеры': {},
@@ -142,6 +163,11 @@ class _BuilderScreenState extends State<BuilderScreen> {
             ),
           ),
         ],
+      ),
+      // 🔽 Добавляем bottomNavigationBar
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
       body: Container(
         decoration: const BoxDecoration(
