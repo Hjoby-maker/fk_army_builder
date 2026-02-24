@@ -20,6 +20,33 @@ class DatasheetKeywordDao extends DatabaseAccessor<AppDatabase>
             ..where((t) => t.datasheetId.equals(datasheetId)))
           .get();
 
+  Future<List<TdatasheetkeywordData>> getKeywordsByDatasheetIds(
+    List<int> datasheetIds,
+  ) async {
+    if (datasheetIds.isEmpty) return [];
+    return (select(tdatasheetkeyword)
+          ..where((t) => t.datasheetId.isIn(datasheetIds)))
+        .get();
+  }
+
+  Future<List<TdatasheetkeywordData>> getUniqueKeywordsByFaction(
+    String factionId,
+  ) async {
+    // ✅ select() доступен внутри DAO
+    return (select(tdatasheetkeyword).join([
+      innerJoin(
+        tdatasheet,
+        tdatasheet.id.equalsExp(tdatasheetkeyword.datasheetId),
+      ),
+    ])
+          ..where(tdatasheet.factionId.equals(factionId))
+          ..where(tdatasheetkeyword.keyword.isNotNull())
+          ..orderBy([OrderingTerm(expression: tdatasheetkeyword.keyword)])
+          ..distinct())
+        .map((row) => row.readTable(tdatasheetkeyword))
+        .get();
+  }
+
   Future<void> insertAllKeywords(
           List<TdatasheetkeywordCompanion> keywordsList) =>
       batch((batch) {
