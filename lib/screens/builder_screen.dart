@@ -7,6 +7,9 @@ import '../screens/widgets/unit_list_item.dart';
 import '../screens/widgets/unit_selection_dialog.dart';
 import '../screens/widgets/unit_detail_popup.dart';
 import '../screens/widgets/bottom_nav_bar.dart';
+import '../database/database.dart';
+import '../database/queries/cross_table_queries.dart';
+import '../models/index.dart' as models;
 
 class BuilderScreen extends StatefulWidget {
   const BuilderScreen({super.key});
@@ -17,6 +20,100 @@ class BuilderScreen extends StatefulWidget {
 
 class _BuilderScreenState extends State<BuilderScreen> {
   int _selectedIndex = 1; // 1 = Builder/Analyze по умолчанию
+
+  // 🔹 Сервис для кросс-запросов
+  late CrossTableQueries _queries;
+  // 🔹 Данные для отображения
+  List<UnitSummary> _units = [];
+  List<String> _availableKeywords = [];
+  Set<String> _selectedKeywords = {};
+
+  // 🔹 Состояние UI
+  bool _isLoading = false;
+  String? _error;
+
+  // 🔹 Текущая фракция (получаем из AppState)
+  String? _currentFactionId;
+
+  @override
+  void initState() {
+    super.initState();
+    _initService();
+  }
+
+  void _initService() {
+    // Получаем БД через Provider
+    final db = Provider.of<AppDatabase>(context, listen: false);
+    _queries = CrossTableQueries(db);
+
+    // Загружаем данные после первого фрейма
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
+  }
+
+  /// Загрузка юнитов и keywords для текущей фракции
+  Future<void> _loadData() async {
+    // Получаем factionId из AppState
+    final appState = Provider.of<AppState>(context, listen: false);
+    final factionId = appState.currentFaction;
+    print(factionId);
+
+    if (factionId == null || factionId.isEmpty) {
+      setState(() => _error = 'Фракция не выбрана');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+      _currentFactionId = factionId;
+    });
+
+    try {
+      // 🔹 Параллельная загрузка юнитов и keywords
+      final results = await Future.wait([
+        _queries.getUnitsSummaryByFaction(
+          factionId: factionId,
+          keywordFilter:
+              _selectedKeywords.isNotEmpty ? _selectedKeywords.toList() : null,
+        ),
+        _queries.getUniqueKeywordsByFaction(factionId),
+      ]);
+
+      setState(() {
+        _units = results[0] as List<UnitSummary>;
+        _availableKeywords = results[1] as List<String>;
+        _isLoading = false;
+      });
+    } catch (e, stack) {
+      setState(() {
+        _error = 'Ошибка загрузки: ${e.toString()}';
+        _isLoading = false;
+      });
+      print('❌ BuilderScreen error: $e');
+      print('📍 $stack');
+    }
+  }
+
+  /// Переключение фильтра по keyword
+  void _toggleKeywordFilter(String keyword) {
+    setState(() {
+      if (_selectedKeywords.contains(keyword)) {
+        _selectedKeywords.remove(keyword);
+      } else {
+        _selectedKeywords.add(keyword);
+      }
+    });
+    // Перезагружаем данные с новым фильтром
+    _loadData();
+  }
+
+  /// Очистка фильтров
+  void _clearFilters() {
+    setState(() => _selectedKeywords.clear());
+    _loadData();
+  }
 
   void _onItemTapped(int index) {
     setState(() {

@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Для модального окна
   String? _selectedFactionType;
   String? _selectedFaction;
+  String? _selectedFactionId; // ← НОВОЕ ПОЛЕ для ID фракции
   final TextEditingController _armyNameController = TextEditingController();
   final TextEditingController _pointsController = TextEditingController();
 
@@ -29,15 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
       csvTable.map((row) => row[0]).toSet().toList();
 
   // Карта для связи тип фракции -> список фракций
-  late final Map<String, List<String>> _factionsByType = () {
-    final map = <String, List<String>>{};
+  late final Map<String, Map<String, String>> _factionsByType = () {
+    final map = <String, Map<String, String>>{};
     for (var row in csvTable) {
       final type = row[0];
       final faction = row[1];
+      final factionId = row[2]; // ← ID фракции из 3 столбца
       if (!map.containsKey(type)) {
-        map[type] = [];
+        map[type] = {};
       }
-      map[type]!.add(faction);
+      map[type]![faction] = factionId; // ← сохраняем пару название -> ID
     }
     return map;
   }();
@@ -67,11 +69,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  // НОВЫЙ МЕТОД для получения ID фракции по названию
+  String? getFactionId(String factionName) {
+    if (_selectedFactionType == null) return null;
+    return _factionsByType[_selectedFactionType]?[factionName];
+  }
+
   void _showNewArmyDialog() {
     // Сбрасываем значения при открытии
     _armyNameController.clear();
     _selectedFactionType = null;
     _selectedFaction = null;
+    _selectedFactionId = null;
     _pointsController.clear();
 
     showDialog(
@@ -217,6 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.amber),
                           items: _selectedFactionType != null
                               ? _factionsByType[_selectedFactionType]!
+                                  .keys
                                   .map((String faction) {
                                   return DropdownMenuItem<String>(
                                     value: faction,
@@ -228,6 +238,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? (String? newValue) {
                                   setState(() {
                                     _selectedFaction = newValue;
+                                    if (newValue != null) {
+                                      _selectedFactionId =
+                                          _factionsByType[_selectedFactionType]
+                                              ?[newValue];
+                                      print(
+                                          'Выбрана фракция: $newValue, ID: $_selectedFactionId');
+                                    } else {
+                                      _selectedFactionId = null;
+                                    }
                                   });
                                 }
                               : null,
@@ -359,6 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       armyName: armyName,
                       factionType: _selectedFactionType!,
                       faction: _selectedFaction!,
+                      factionId: _selectedFactionId!, // ← ПЕРЕДАЕМ ID
                       maxPoints: points,
                     );
 

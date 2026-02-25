@@ -31,6 +31,16 @@ class DatasheetModelCostDao extends DatabaseAccessor<AppDatabase>
         ..where((t) => t.datasheetId.equals(datasheetId) & t.line.equals(line)))
       .go();
 
+  /// Получить все costs для списка datasheet IDs (для оптимизации запросов)
+  Future<List<TdatasheetmodelcostData>> getCostsByDatasheetIds(
+    List<int> datasheetIds,
+  ) async {
+    if (datasheetIds.isEmpty) return [];
+    return (select(tdatasheetmodelcost)
+          ..where((t) => t.datasheetId.isIn(datasheetIds)))
+        .get();
+  }
+
   // Конвертация в модели
   Future<List<models.DatasheetModelCost>> getAllCostModels() async {
     final data = await getAllCosts();

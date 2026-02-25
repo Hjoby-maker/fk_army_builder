@@ -17,12 +17,14 @@ class AppState extends ChangeNotifier {
   String? _currentArmyName;
   String? _currentFactionType;
   String? _currentFaction;
+  String? _currentFactionId; // ← НОВОЕ ПОЛЕ для ID фракции
   int? _currentMaxPoints;
 
   // Геттеры для полей армии
   String? get currentArmyName => _currentArmyName;
   String? get currentFactionType => _currentFactionType;
   String? get currentFaction => _currentFaction;
+  String? get currentFactionId => _currentFactionId; // ← НОВЫЙ ГЕТТЕР
   int? get currentMaxPoints => _currentMaxPoints;
 
 // Геттер для DatabaseService
@@ -72,14 +74,17 @@ class AppState extends ChangeNotifier {
     required String armyName,
     required String factionType,
     required String faction,
+    required String factionId, // ← НОВЫЙ ПАРАМЕТР
     required int maxPoints,
   }) {
     _currentArmyName = armyName;
     _currentFactionType = factionType;
     _currentFaction = faction;
+    _currentFactionId = factionId; // ← СОХРАНЯЕМ ID
     _currentMaxPoints = maxPoints;
     notifyListeners();
-    print('Параметры армии сохранены: $armyName, $faction, $maxPoints');
+    print(
+        'Параметры армии сохранены: $armyName, $faction, $maxPoints, $factionId');
   }
 
   // Метод для сброса параметров армии (после использования или при отмене)
@@ -87,6 +92,7 @@ class AppState extends ChangeNotifier {
     _currentArmyName = null;
     _currentFactionType = null;
     _currentFaction = null;
+    _currentFactionId = null; // ← СБРАСЫВАЕМ ID
     _currentMaxPoints = null;
     notifyListeners();
     print('Параметры армии сброшены');
