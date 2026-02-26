@@ -1,24 +1,24 @@
-// lib/widgets/unit_detail_popup.dart
+// lib/screens/widgets/unit_detail_popup.dart
 import 'package:flutter/material.dart';
-import 'unit_selection_dialog.dart';
+import '../../database/queries/cross_table_queries.dart';
 
-/// Всплывающее окно с детальной информацией о юните
 class UnitDetailPopup extends StatelessWidget {
-  final UnitOption unit;
+  final UnitSummary unit;
 
-  const UnitDetailPopup({super.key, required this.unit});
+  const UnitDetailPopup({
+    super.key,
+    required this.unit,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(20),
+      backgroundColor: const Color.fromARGB(255, 45, 45, 45),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A2310),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.amber.withOpacity(0.4)),
+        width: double.maxFinite,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -26,87 +26,130 @@ class UnitDetailPopup extends StatelessWidget {
             // Заголовок
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.15),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 136, 2, 2),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
               ),
               child: Row(
                 children: [
+                  const Icon(Icons.info_outline, color: Colors.amber),
+                  const SizedBox(width: 8),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          unit.name,
-                          style: const TextStyle(
-                            color: Colors.amber,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(Icons.bolt,
-                                color: Colors.amber, size: 16),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${unit.cost} очков',
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                          ],
-                        ),
-                      ],
+                    child: Text(
+                      unit.datasheet.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white70),
                   ),
                 ],
               ),
             ),
-            // Контент
-            Flexible(
+
+            // Детальная информация
+            Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (unit.description != null) ...[
+                    _buildInfoRow('Роль', unit.role ?? 'Не указана'),
+                    _buildInfoRow('Стоимость', unit.costString),
+
+                    const SizedBox(height: 16),
+                    const Divider(color: Colors.amber),
+
+                    // Ключевые слова
+                    if (unit.keywords.isNotEmpty) ...[
                       const Text(
-                        'Описание',
+                        'Ключевые слова:',
                         style: TextStyle(
                           color: Colors.amber,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        unit.description!,
-                        style:
-                            const TextStyle(color: Colors.white, height: 1.4),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: unit.keywords.map((keyword) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.amber.withOpacity(0.3),
+                              ),
+                            ),
+                            child: Text(
+                              keyword.keyword ?? '',
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          );
+                        }).toList(),
                       ),
-                      const SizedBox(height: 16),
                     ],
-                    // Детали из Map (если есть)
-                    if (unit.details != null) ...[
-                      _buildDetailsSection(unit.details!),
-                    ],
-                    // Если нет деталей - заглушка
-                    if (unit.description == null &&
-                        (unit.details?.isEmpty ?? true))
-                      const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Text(
-                            'Детальная информация\nбудет доступна позже',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white70),
-                          ),
+
+                    const SizedBox(height: 16),
+                    const Divider(color: Colors.amber),
+
+                    // Стоимость моделей
+                    if (unit.costs.isNotEmpty) ...[
+                      const Text(
+                        'Стоимость моделей:',
+                        style: TextStyle(
+                          color: Colors.amber,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      ...unit.costs.map((cost) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.black26,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  cost.description ?? 'Модель ${cost.line}',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${cost.cost} pts',
+                                style: const TextStyle(
+                                  color: Colors.amber,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
                   ],
                 ),
               ),
@@ -117,44 +160,29 @@ class UnitDetailPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsSection(Map<String, dynamic> details) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Характеристики',
-          style: TextStyle(
-            color: Colors.amber,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '$label:',
+            style: const TextStyle(
+              color: Colors.amber,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        ...details.entries.map((entry) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 120,
-                    child: Text(
-                      '${entry.key}:',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '${entry.value}',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            )),
-      ],
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

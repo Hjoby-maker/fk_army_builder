@@ -1,29 +1,10 @@
-// lib/widgets/unit_selection_dialog.dart
+// lib/screens/widgets/unit_selection_dialog.dart
 import 'package:flutter/material.dart';
-import 'unit_list_item.dart';
-import 'unit_detail_popup.dart';
+import '../../database/queries/cross_table_queries.dart';
 
-/// Модель данных для отображения юнита в диалоге
-class UnitOption {
-  final int id;
-  final String name;
-  final int cost;
-  final String? description;
-  final Map<String, dynamic>? details; // для детального просмотра
-
-  UnitOption({
-    required this.id,
-    required this.name,
-    required this.cost,
-    this.description,
-    this.details,
-  });
-}
-
-/// Модальное окно со списком юнитов для выбора
-class UnitSelectionDialog extends StatefulWidget {
+class UnitSelectionDialog extends StatelessWidget {
   final String title;
-  final List<UnitOption> units;
+  final List<UnitSummary> units;
   final Set<int> selectedIds;
   final Function(int id, bool selected) onToggleSelect;
 
@@ -36,174 +17,162 @@ class UnitSelectionDialog extends StatefulWidget {
   });
 
   @override
-  State<UnitSelectionDialog> createState() => _UnitSelectionDialogState();
-}
-
-class _UnitSelectionDialogState extends State<UnitSelectionDialog> {
-  String _searchQuery = '';
-
-  List<UnitOption> get _filteredUnits {
-    if (_searchQuery.isEmpty) return widget.units;
-    final query = _searchQuery.toLowerCase();
-    return widget.units
-        .where((u) => u.name.toLowerCase().contains(query))
-        .toList();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      backgroundColor: const Color.fromARGB(255, 45, 45, 45),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        width: double.infinity,
-        constraints: const BoxConstraints(maxHeight: 600),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A2310),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.amber.withOpacity(0.4)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
+        width: double.maxFinite,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Заголовок диалога
+            // Заголовок
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.15),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
-                border: Border(
-                  bottom: BorderSide(color: Colors.amber.withOpacity(0.3)),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 136, 2, 2),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
                 ),
               ),
               child: Row(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.title,
-                          style: const TextStyle(
-                            color: Colors.amber,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '${widget.selectedIds.length} выбрано',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
+                  const Icon(Icons.sports_mma, color: Colors.amber),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const Spacer(),
                   IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white70),
                   ),
                 ],
               ),
             ),
-            // Поиск
-            if (widget.units.length > 5)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: TextField(
-                  onChanged: (v) => setState(() => _searchQuery = v),
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Поиск юнита...',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                    prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.1),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  ),
-                ),
-              ),
+
             // Список юнитов
             Expanded(
-              child: _filteredUnits.isEmpty
-                  ? Center(
+              child: units.isEmpty
+                  ? const Center(
                       child: Text(
-                        _searchQuery.isEmpty
-                            ? 'Нет доступных юнитов'
-                            : 'Ничего не найдено',
-                        style: const TextStyle(color: Colors.white70),
+                        'Нет доступных юнитов',
+                        style: TextStyle(color: Colors.white70),
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _filteredUnits.length,
+                      padding: const EdgeInsets.all(8),
+                      itemCount: units.length,
                       itemBuilder: (context, index) {
-                        final unit = _filteredUnits[index];
-                        final isSelected = widget.selectedIds.contains(unit.id);
+                        final unit = units[index];
+                        final isSelected =
+                            selectedIds.contains(unit.datasheet.id);
 
-                        return UnitListItem(
-                          name: unit.name,
-                          cost: unit.cost,
-                          description: unit.description,
-                          isSelected: isSelected,
-                          onSelectPressed: () {
-                            widget.onToggleSelect(unit.id, !isSelected);
-                            // Не закрываем диалог - пользователь может выбрать несколько
-                          },
-                          onInfoPressed: unit.details != null
-                              ? () => _showUnitDetails(context, unit)
-                              : null,
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          color: const Color.fromARGB(255, 60, 60, 60),
+                          child: CheckboxListTile(
+                            title: Text(
+                              unit.datasheet.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (unit.role != null)
+                                  Text(
+                                    'Тип: ${unit.role}',
+                                    style: TextStyle(
+                                        color: Colors.grey[400], fontSize: 12),
+                                  ),
+                                if (unit.keywords.isNotEmpty)
+                                  Text(
+                                    'Ключевые слова: ${unit.keywordsString}',
+                                    style: TextStyle(
+                                        color: Colors.grey[400], fontSize: 12),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                              ],
+                            ),
+                            value: isSelected,
+                            onChanged: (selected) {
+                              onToggleSelect(
+                                  unit.datasheet.id, selected ?? false);
+                            },
+                            secondary: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: unit.hasCost
+                                    ? Colors.amber.withOpacity(0.2)
+                                    : Colors.grey.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                unit.costString,
+                                style: TextStyle(
+                                  color:
+                                      unit.hasCost ? Colors.amber : Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            activeColor: Colors.amber,
+                            checkColor: Colors.black,
+                          ),
                         );
                       },
                     ),
             ),
-            // Кнопка "Готово"
+
+            // Кнопки действий
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.2),
-                borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(20)),
+                color: Colors.grey[900],
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
               ),
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white70,
+                    ),
+                    child: const Text('Закрыть'),
                   ),
-                ),
-                child: const Text(
-                  'Готово',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      foregroundColor: Colors.black,
+                    ),
+                    child: const Text('Готово'),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  void _showUnitDetails(BuildContext context, UnitOption unit) {
-    showDialog(
-      context: context,
-      builder: (ctx) => UnitDetailPopup(unit: unit),
     );
   }
 }
