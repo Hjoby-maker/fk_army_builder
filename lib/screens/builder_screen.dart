@@ -42,8 +42,12 @@ class _BuilderScreenState extends State<BuilderScreen> {
   }
 
   void _initService() {
-    // Получаем БД через Provider
-    final db = Provider.of<AppDatabase>(context, listen: false);
+    // Получаем БД через AppState
+
+    final appState = Provider.of<AppState>(context, listen: false);
+    final db = appState.databaseService
+        .database; // предполагая, что DatabaseService имеет доступ
+
     _queries = CrossTableQueries(db);
 
     // Загружаем данные после первого фрейма
@@ -56,7 +60,7 @@ class _BuilderScreenState extends State<BuilderScreen> {
   Future<void> _loadData() async {
     // Получаем factionId из AppState
     final appState = Provider.of<AppState>(context, listen: false);
-    final factionId = appState.currentFaction;
+    final factionId = appState.currentFactionId;
     print(factionId);
 
     if (factionId == null || factionId.isEmpty) {
