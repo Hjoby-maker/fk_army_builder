@@ -107,7 +107,7 @@ class CrossTableQueries extends DatabaseAccessor<AppDatabase> {
     ])
       ..where(db.tdatasheet.factionId.equals(factionId))
       ..where(db.tdatasheetkeyword.keyword.isNotNull())
-      ..orderBy([OrderingTerm(expression: db.tdatasheetkeyword.keyword!)]);
+      ..orderBy([OrderingTerm(expression: db.tdatasheetkeyword.keyword)]);
     // ⚠️ distinct не работает с JOIN в Drift 2.x — используем .toSet() ниже
 
     final rows = await query.get();
@@ -227,8 +227,8 @@ class UnitSummary {
   /// Форматированная стоимость
   String get costString {
     if (minCost == null && maxCost == null) return '—';
-    if (minCost == maxCost) return '${minCost} pts';
-    return '${minCost}–${maxCost} pts';
+    if (minCost == maxCost) return '$minCost pts';
+    return '$minCost–$maxCost pts';
   }
 
   /// Есть ли у юнита стоимость
