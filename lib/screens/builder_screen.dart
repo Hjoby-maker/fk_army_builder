@@ -26,8 +26,9 @@ class _BuilderScreenState extends State<BuilderScreen> {
   bool _isLoading = false;
   String? _error;
 
-  // 🔹 Всегда показываем эти 7 секций
-  final Map<String, Set<int>> _selectedUnits = {
+  // 🔹 Новая структура для хранения выбранных юнитов с количеством
+  // Map<Название секции, Map<ID юнита, количество>>
+  final Map<String, Map<int, int>> _selectedUnitsWithQuantity = {
     'Epic Hero': {},
     'Characters': {},
     'Battleline': {},
@@ -36,6 +37,16 @@ class _BuilderScreenState extends State<BuilderScreen> {
     'Dedicated Transports': {},
     'Fortifications': {},
   };
+
+  // Для обратной совместимости с существующим кодом
+  // Получаем Set ID выбранных юнитов (уникальные ID)
+  Map<String, Set<int>> get _selectedUnits {
+    final result = <String, Set<int>>{};
+    _selectedUnitsWithQuantity.forEach((section, quantityMap) {
+      result[section] = quantityMap.keys.toSet();
+    });
+    return result;
+  }
 
   final Map<String, String> _roleToSection = {
     'Epic Hero': 'Epic Hero',
@@ -132,12 +143,14 @@ class _BuilderScreenState extends State<BuilderScreen> {
     }
   }
 
+  /// Общая сумма очков с учетом количества
   int get _totalPoints {
     int sum = 0;
     for (final unit in _units) {
-      for (final section in _selectedUnits.values) {
-        if (section.contains(unit.datasheet.id)) {
-          sum += unit.minCost ?? 0;
+      for (final section in _selectedUnitsWithQuantity.values) {
+        final quantity = section[unit.datasheet.id];
+        if (quantity != null && quantity > 0) {
+          sum += (unit.minCost ?? 0) * quantity;
           break;
         }
       }
@@ -145,8 +158,21 @@ class _BuilderScreenState extends State<BuilderScreen> {
     return sum;
   }
 
+  /// Общее количество выбранных юнитов (с учетом количества)
   int _getTotalSelectedCount() {
-    return _selectedUnits.values.fold(0, (sum, set) => sum + set.length);
+    int total = 0;
+    for (final quantityMap in _selectedUnitsWithQuantity.values) {
+      for (final quantity in quantityMap.values) {
+        total += quantity;
+      }
+    }
+    return total;
+  }
+
+  /// Количество выбранных юнитов в конкретной секции (с учетом количества)
+  int _getSelectedCountForSection(String section) {
+    final quantityMap = _selectedUnitsWithQuantity[section] ?? {};
+    return quantityMap.values.fold(0, (sum, qty) => sum + qty);
   }
 
   /// Получаем количество доступных юнитов в секции
@@ -159,10 +185,20 @@ class _BuilderScreenState extends State<BuilderScreen> {
   List<UnitSummary> _getSelectedUnitsForSection(String section) {
     if (_units.isEmpty) return [];
 
-    final selectedIds = _selectedUnits[section] ?? {};
-    return _units
-        .where((unit) => selectedIds.contains(unit.datasheet.id))
-        .toList();
+    final quantityMap = _selectedUnitsWithQuantity[section] ?? {};
+    final result = <UnitSummary>[];
+
+    for (final unit in _units) {
+      final quantity = quantityMap[unit.datasheet.id];
+      if (quantity != null && quantity > 0) {
+        // Добавляем юнит в список нужное количество раз
+        for (int i = 0; i < quantity; i++) {
+          result.add(unit);
+        }
+      }
+    }
+
+    return result;
   }
 
   /// Получаем юниты для конкретной секции (для диалога выбора)
@@ -171,8 +207,9 @@ class _BuilderScreenState extends State<BuilderScreen> {
     return _units.where((unit) => _getUnitSection(unit) == section).toList();
   }
 
+  /// Обновленный метод показа диалога выбора
   void _showUnitSelector(String category) {
-    print(category);
+    print('📱 Открыта категория: $category');
     final availableUnits = _getUnitsForSection(category);
 
     if (availableUnits.isEmpty) {
@@ -185,18 +222,37 @@ class _BuilderScreenState extends State<BuilderScreen> {
       return;
     }
 
+    // Получаем текущие выбранные ID для этой секции
+    final currentSelectedIds = _selectedUnitsWithQuantity[category]!
+        .entries
+        .where((e) => e.value > 0)
+        .map((e) => e.key)
+        .toSet();
+
     showDialog(
       context: context,
       builder: (context) => UnitSelectionDialog(
         title: category,
         units: availableUnits,
-        selectedIds: _selectedUnits[category]!,
+        selectedIds: currentSelectedIds,
         onToggleSelect: (id, selected) {
           setState(() {
             if (selected) {
-              _selectedUnits[category]!.add(id);
+              // Для уникальных секций просто добавляем
+              // Для массовых секций диалог сам управляет количеством
+              _selectedUnitsWithQuantity[category]![id] = 1;
             } else {
-              _selectedUnits[category]!.remove(id);
+              _selectedUnitsWithQuantity[category]!.remove(id);
+            }
+          });
+        },
+        onQuantityChange: (id, quantity) {
+          // Новый колбэк для обновления количества
+          setState(() {
+            if (quantity > 0) {
+              _selectedUnitsWithQuantity[category]![id] = quantity;
+            } else {
+              _selectedUnitsWithQuantity[category]!.remove(id);
             }
           });
         },
@@ -427,28 +483,45 @@ class _BuilderScreenState extends State<BuilderScreen> {
                 ),
               ),
             ]
-          : selectedUnits
-              .map((unit) => _buildUnitListItem(unit, title))
-              .toList(),
+          : _buildUnitListWithQuantities(selectedUnits, title),
     );
   }
 
-  Widget _buildUnitListItem(UnitSummary unit, String sectionTitle) {
-    return UnitListItem(
-      name: unit.datasheet.name,
-      cost: unit.minCost ?? 0,
-      description: unit.keywordsString,
-      isSelected: true,
-      onSelectPressed: () {
-        setState(() {
-          _selectedUnits[sectionTitle]!.remove(unit.datasheet.id);
-        });
-      },
-      onInfoPressed: () => showDialog(
-        context: context,
-        builder: (ctx) => UnitDetailPopup(unit: unit),
-      ),
-    );
+  /// Строит список юнитов с учетом количества
+  List<Widget> _buildUnitListWithQuantities(
+      List<UnitSummary> units, String sectionTitle) {
+    final Map<int, int> quantities = {};
+    for (final unit in units) {
+      quantities[unit.datasheet.id] = (quantities[unit.datasheet.id] ?? 0) + 1;
+    }
+
+    final result = <Widget>[];
+    for (final unit in units) {
+      final id = unit.datasheet.id;
+      if (quantities.containsKey(id)) {
+        final quantity = quantities[id]!;
+        result.add(
+          UnitListItem(
+            name: unit.datasheet.name,
+            cost: unit.minCost ?? 0,
+            description: unit.keywordsString,
+            quantity: quantity, // Новый параметр для отображения количества
+            isSelected: true,
+            onSelectPressed: () {
+              setState(() {
+                _selectedUnitsWithQuantity[sectionTitle]!.remove(id);
+              });
+            },
+            onInfoPressed: () => showDialog(
+              context: context,
+              builder: (ctx) => UnitDetailPopup(unit: unit),
+            ),
+          ),
+        );
+        quantities.remove(id); // Убираем, чтобы не дублировать
+      }
+    }
+    return result;
   }
 
   Widget _buildBottomActions() {
