@@ -8,7 +8,7 @@ import '../screens/widgets/unit_selection_dialog.dart';
 import '../screens/widgets/unit_detail_popup.dart';
 import '../screens/widgets/bottom_nav_bar.dart';
 import '../screens/widgets/army_option.dart';
-import '../screens/widgets/enhancement_dialog.dart';
+import '../screens/widgets/detachment_dialog.dart';
 import '../screens/widgets/points_dialog.dart';
 import '../database/queries/cross_table_queries.dart';
 
@@ -81,8 +81,8 @@ class _BuilderScreenState extends State<BuilderScreen>
       case 'Points':
         _showPointsDialog();
         break;
-      case 'Enhancement':
-        _showEnhancementDialog();
+      case 'Detachment':
+        _showDetachmentDialog();
         break;
       case 'ArmyOption':
         _showArmyOption();
@@ -97,10 +97,10 @@ class _BuilderScreenState extends State<BuilderScreen>
     );
   }
 
-  void _showEnhancementDialog() {
+  void _showDetachmentDialog() {
     showDialog(
       context: context,
-      builder: (context) => const EnhancementDialog(),
+      builder: (context) => const DetachmentDialog(),
     );
   }
 
@@ -399,7 +399,9 @@ class _BuilderScreenState extends State<BuilderScreen>
       padding: const EdgeInsets.all(12),
       color: Colors.black26,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Информация о фракции и детачменте
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,13 +413,52 @@ class _BuilderScreenState extends State<BuilderScreen>
                       fontSize: 18,
                       fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  appState.currentFaction ?? 'Фракция не выбрана',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                const SizedBox(height: 2),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    // Фракция
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border:
+                            Border.all(color: Colors.amber.withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        appState.currentFaction ?? 'Фракция не выбрана',
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 12),
+                      ),
+                    ),
+
+                    // Детачмент (если выбран)
+                    if (appState.currentDetachment != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border:
+                              Border.all(color: Colors.amber.withOpacity(0.3)),
+                        ),
+                        child: Text(
+                          appState.currentDetachment!,
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 12),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
           ),
+
+          // Счетчик юнитов
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -613,9 +654,9 @@ class _BuilderScreenState extends State<BuilderScreen>
                   const SizedBox(height: 8),
                   _buildConfigButton(
                     icon: Icons.group,
-                    label: 'Enhancement',
-                    description: 'Choose enhancement for faction',
-                    onTap: () => _showConfigurationDialog('Enhancement'),
+                    label: 'Detachment',
+                    description: 'Choose detachment for faction',
+                    onTap: () => _showConfigurationDialog('Detachment'),
                   ),
                   const SizedBox(height: 8),
                   _buildConfigButton(

@@ -253,6 +253,30 @@ class CrossTableQueries extends DatabaseAccessor<AppDatabase> {
     final result = await query.get();
     return result.isNotEmpty;
   }
+
+// Добавьте в класс CrossTableQueries в файле cross_table_queries.dart
+
+  /// Получает детачменты для указанной фракции
+  Future<List<models.Detachment>> getDetachmentsByFaction(
+      String factionId) async {
+    final query = select(db.tdetachment)
+      ..where((t) => t.factionId.equals(factionId))
+      ..where(
+          (t) => t.type.isNull() | t.type.equals('')) // NULL или пустая строка
+      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
+
+    final data = await query.get();
+
+    return data
+        .map((d) => models.Detachment(
+              id: d.id,
+              factionId: d.factionId,
+              name: d.name,
+              legend: d.legend,
+              type: d.type,
+            ))
+        .toList();
+  }
 }
 
 // ─────────────────────────────────────────────────────────

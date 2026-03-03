@@ -20,12 +20,18 @@ class AppState extends ChangeNotifier {
   String? _currentFactionId; // ← НОВОЕ ПОЛЕ для ID фракции
   int? _currentMaxPoints;
 
+  String? _currentDetachment;
+  int? _currentDetachmentId;
+
   // Геттеры для полей армии
   String? get currentArmyName => _currentArmyName;
   String? get currentFactionType => _currentFactionType;
   String? get currentFaction => _currentFaction;
   String? get currentFactionId => _currentFactionId; // ← НОВЫЙ ГЕТТЕР
   int? get currentMaxPoints => _currentMaxPoints;
+
+  String? get currentDetachment => _currentDetachment;
+  int? get currentDetachmentId => _currentDetachmentId;
 
 // Геттер для DatabaseService
   DatabaseService get databaseService => _db;
@@ -58,6 +64,20 @@ class AppState extends ChangeNotifier {
       // Не пробрасываем исключение дальше, чтобы приложение запустилось
       // но покажем ошибку пользователю
     }
+  }
+
+  void updateMaxPoints(int points) {
+    _currentMaxPoints = points;
+    notifyListeners();
+    print('Max points updated to: $points');
+  }
+
+  // Метод для обновления детачмента
+  void updateDetachment({String? detachmentName, int? detachmentId}) {
+    _currentDetachment = detachmentName;
+    _currentDetachmentId = detachmentId;
+    notifyListeners();
+    print('Detachment updated to: $detachmentName (ID: $detachmentId)');
   }
 
   /* Future<void> initialize() async {
@@ -94,6 +114,8 @@ class AppState extends ChangeNotifier {
     _currentFaction = null;
     _currentFactionId = null; // ← СБРАСЫВАЕМ ID
     _currentMaxPoints = null;
+    _currentDetachment = null;
+    _currentDetachmentId = null;
     notifyListeners();
     print('Параметры армии сброшены');
   }
