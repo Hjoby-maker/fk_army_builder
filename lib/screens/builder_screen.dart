@@ -7,6 +7,9 @@ import '../screens/widgets/unit_list_item.dart';
 import '../screens/widgets/unit_selection_dialog.dart';
 import '../screens/widgets/unit_detail_popup.dart';
 import '../screens/widgets/bottom_nav_bar.dart';
+import '../screens/widgets/army_option.dart';
+import '../screens/widgets/enhancement_dialog.dart';
+import '../screens/widgets/points_dialog.dart';
 import '../database/queries/cross_table_queries.dart';
 
 class BuilderScreen extends StatefulWidget {
@@ -16,10 +19,12 @@ class BuilderScreen extends StatefulWidget {
   State<BuilderScreen> createState() => _BuilderScreenState();
 }
 
-class _BuilderScreenState extends State<BuilderScreen> {
+class _BuilderScreenState extends State<BuilderScreen>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 1;
 
   late CrossTableQueries _queries;
+  bool _isConfigurationExpanded = false; // По умолчанию свернута
   List<UnitSummary> _units = [];
   Set<String> _selectedKeywords = {};
 
@@ -29,6 +34,7 @@ class _BuilderScreenState extends State<BuilderScreen> {
   // 🔹 Новая структура для хранения выбранных юнитов с количеством
   // Map<Название секции, Map<ID юнита, количество>>
   final Map<String, Map<int, int>> _selectedUnitsWithQuantity = {
+    'Configuration': {}, // Новая секция
     'Epic Hero': {},
     'Characters': {},
     'Battleline': {},
@@ -59,6 +65,7 @@ class _BuilderScreenState extends State<BuilderScreen> {
   };
 
   final List<String> _sections = const [
+    'Configuration', // Новая секция первой
     'Epic Hero',
     'Characters',
     'Battleline',
@@ -68,10 +75,65 @@ class _BuilderScreenState extends State<BuilderScreen> {
     'Fortifications',
   ];
 
+  // Добавьте новый метод для обработки нажатий на кнопки конфигурации
+  void _showConfigurationDialog(String type) {
+    switch (type) {
+      case 'Points':
+        _showPointsDialog();
+        break;
+      case 'Enhancement':
+        _showEnhancementDialog();
+        break;
+      case 'ArmyOption':
+        _showArmyOption();
+        break;
+    }
+  }
+
+  void _showPointsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const PointsDialog(),
+    );
+  }
+
+  void _showEnhancementDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const EnhancementDialog(),
+    );
+  }
+
+  void _showArmyOption() {
+    showDialog(
+      context: context,
+      builder: (context) => const ArmyOption(),
+    );
+  }
+
+  late AnimationController _configurationController;
+  late Animation<double> _configurationIconTurns;
+
   @override
   void initState() {
     super.initState();
+    _configurationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _configurationIconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
+      CurvedAnimation(
+        parent: _configurationController,
+        curve: Curves.fastOutSlowIn,
+      ),
+    );
     _initService();
+  }
+
+  @override
+  void dispose() {
+    _configurationController.dispose();
+    super.dispose();
   }
 
   void _initService() {
@@ -167,12 +229,6 @@ class _BuilderScreenState extends State<BuilderScreen> {
       }
     }
     return total;
-  }
-
-  /// Количество выбранных юнитов в конкретной секции (с учетом количества)
-  int _getSelectedCountForSection(String section) {
-    final quantityMap = _selectedUnitsWithQuantity[section] ?? {};
-    return quantityMap.values.fold(0, (sum, qty) => sum + qty);
   }
 
   /// Получаем количество доступных юнитов в секции
@@ -459,6 +515,10 @@ class _BuilderScreenState extends State<BuilderScreen> {
   }
 
   Widget _buildSection(String title) {
+    // Специальная обработка для секции Configuration
+    if (title == 'Configuration') {
+      return _buildConfigurationSection();
+    }
     final selectedUnits = _getSelectedUnitsForSection(title);
     final availableCount = _getAvailableCountForSection(title);
 
@@ -467,6 +527,7 @@ class _BuilderScreenState extends State<BuilderScreen> {
       itemCount: availableCount,
       selectedCount: selectedUnits.length,
       onAddPressed: () => _showUnitSelector(title),
+      initiallyExpanded: false, // Все остальные секции развернуты по умолчанию
       children: selectedUnits.isEmpty
           ? [
               Container(
@@ -484,6 +545,161 @@ class _BuilderScreenState extends State<BuilderScreen> {
               ),
             ]
           : _buildUnitListWithQuantities(selectedUnits, title),
+    );
+  }
+
+  // Новый метод для построения секции Configuration
+  Widget _buildConfigurationSection() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.amber.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          // Заголовок секции с возможностью сворачивания
+          InkWell(
+            onTap: _toggleConfiguration,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.2),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Иконка сворачивания
+                  RotationTransition(
+                    turns: _configurationIconTurns,
+                    child: const Icon(Icons.expand_more,
+                        color: Colors.amber, size: 24),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.settings, color: Colors.amber, size: 24),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Configuration',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  // Счетчик не показываем
+                ],
+              ),
+            ),
+          ),
+
+          // Контент секции - сворачиваемый
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  _buildConfigButton(
+                    icon: Icons.edit,
+                    label: 'Points',
+                    description: 'Set count points',
+                    onTap: () => _showConfigurationDialog('Points'),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildConfigButton(
+                    icon: Icons.group,
+                    label: 'Enhancement',
+                    description: 'Choose enhancement for faction',
+                    onTap: () => _showConfigurationDialog('Enhancement'),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildConfigButton(
+                    icon: Icons.track_changes,
+                    label: 'Army Option',
+                    description: 'Set options for visible',
+                    onTap: () => _showConfigurationDialog('ArmyOption'),
+                  ),
+                ],
+              ),
+            ),
+            crossFadeState: _isConfigurationExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 200),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Вспомогательный метод для создания кнопок конфигурации
+  Widget _buildConfigButton({
+    required IconData icon,
+    required String label,
+    required String description,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.amber.withOpacity(0.3)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: Colors.amber, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right,
+                color: Colors.amber,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -619,5 +835,16 @@ class _BuilderScreenState extends State<BuilderScreen> {
     }
     return _roleToSection[unit.datasheet.role] ?? 'Дополнительно';
     //if (!unit.hasCost) return 'Дополнительно';
+  }
+
+  void _toggleConfiguration() {
+    setState(() {
+      _isConfigurationExpanded = !_isConfigurationExpanded;
+      if (_isConfigurationExpanded) {
+        _configurationController.forward();
+      } else {
+        _configurationController.reverse();
+      }
+    });
   }
 }
