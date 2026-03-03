@@ -21,12 +21,10 @@ class _BuilderScreenState extends State<BuilderScreen> {
 
   late CrossTableQueries _queries;
   List<UnitSummary> _units = [];
-  List<String> _availableKeywords = [];
   Set<String> _selectedKeywords = {};
 
   bool _isLoading = false;
   String? _error;
-  // String? _currentFactionId;
 
   // 🔹 Всегда показываем эти 7 секций
   final Map<String, Set<int>> _selectedUnits = {
@@ -102,20 +100,9 @@ class _BuilderScreenState extends State<BuilderScreen> {
 
       setState(() {
         _units = results[0] as List<UnitSummary>;
-        _availableKeywords = results[1] as List<String>;
+        //  _availableKeywords = results[1] as List<String>;
         _isLoading = false;
       });
-
-      /*print('✅ Загружено юнитов: ${_units.length}');
-      // Диагностика: смотрим у каких юнитов есть Epic Hero
-      print('\n🔍 ЮНИТЫ С KEYWORD "EPIC HERO":');
-      for (var unit in _units) {
-        final hasEpicHero =
-            unit.keywords.any((k) => k.keyword?.toLowerCase() == 'epic hero');
-        if (hasEpicHero) {
-          print('  📌 ${unit.datasheet.name} (role: ${unit.datasheet.role})');
-        }
-      }*/
     } catch (e) {
       setState(() {
         _error = 'Ошибка загрузки: ${e.toString()}';
@@ -123,17 +110,6 @@ class _BuilderScreenState extends State<BuilderScreen> {
       });
       print('❌ BuilderScreen error: $e');
     }
-  }
-
-  void _toggleKeywordFilter(String keyword) {
-    setState(() {
-      if (_selectedKeywords.contains(keyword)) {
-        _selectedKeywords.remove(keyword);
-      } else {
-        _selectedKeywords.add(keyword);
-      }
-    });
-    _loadData();
   }
 
   void _clearFilters() {
@@ -191,14 +167,6 @@ class _BuilderScreenState extends State<BuilderScreen> {
 
   /// Получаем юниты для конкретной секции (для диалога выбора)
   List<UnitSummary> _getUnitsForSection(String section) {
-    /*if (_units.isEmpty) return [];
-
-    return _units.where((unit) {
-      if (!unit.hasCost) return false;
-      final role = unit.datasheet.role ?? 'Other';
-      final sectionName = _roleToSection[role] ?? 'Дополнительно';
-      return sectionName == section;
-    }).toList();*/
     if (_units.isEmpty) return [];
     return _units.where((unit) => _getUnitSection(unit) == section).toList();
   }
@@ -304,16 +272,9 @@ class _BuilderScreenState extends State<BuilderScreen> {
         child: Column(
           children: [
             _buildFactionHeader(appState),
-
-            // Фильтры отображаем только если есть ключевые слова и не в состоянии загрузки
-            //if (_availableKeywords.isNotEmpty && !_isLoading)
-            //   _buildKeywordFilters(),
-
-            // ВСЕГДА показываем секции, независимо от состояния загрузки
             Expanded(
               child: _buildSectionsList(),
             ),
-
             _buildBottomActions(),
           ],
         ),
@@ -369,34 +330,6 @@ class _BuilderScreenState extends State<BuilderScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildKeywordFilters() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      color: Colors.black12,
-      child: Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: _availableKeywords.map((keyword) {
-          final isSelected = _selectedKeywords.contains(keyword);
-          return FilterChip(
-            label: Text(
-              keyword,
-              style: TextStyle(
-                  fontSize: 12,
-                  color: isSelected ? Colors.black : Colors.white70),
-            ),
-            selected: isSelected,
-            onSelected: (_) => _toggleKeywordFilter(keyword),
-            backgroundColor: Colors.grey[800],
-            selectedColor: Colors.amber,
-            checkmarkColor: Colors.black,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          );
-        }).toList(),
       ),
     );
   }
