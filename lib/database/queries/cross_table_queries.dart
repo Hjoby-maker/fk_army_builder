@@ -189,6 +189,70 @@ class CrossTableQueries extends DatabaseAccessor<AppDatabase> {
       link: data.link,
     );
   }
+
+// В класс CrossTableQueries добавьте эти методы для диагностики
+
+  /// Проверяет, существует ли фракция
+  Future<bool> checkFactionExists(String factionId) async {
+    final query = select(db.tfaction)..where((t) => t.id.equals(factionId));
+    final result = await query.get();
+    return result.isNotEmpty;
+  }
+
+  /// Получает количество datasheet для фракции
+  Future<int> getDatasheetCountForFaction(String factionId) async {
+    final query = select(db.tdatasheet)
+      ..where((t) => t.factionId.equals(factionId));
+    final result = await query.get();
+    return result.length;
+  }
+
+  /// Получает пример datasheet для диагностики
+  Future<String> getSampleDatasheet(String factionId) async {
+    final query = select(db.tdatasheet)
+      ..where((t) => t.factionId.equals(factionId))
+      ..limit(1);
+    final result = await query.get();
+    if (result.isEmpty) return 'Нет данных';
+    final ds = result.first;
+    return 'id: ${ds.id}, name: ${ds.name}, role: ${ds.role}';
+  }
+
+  /// Получает количество keywords для фракции
+  Future<int> getKeywordCountForFaction(String factionId) async {
+    final query = select(db.tdatasheetkeyword).join([
+      innerJoin(
+        db.tdatasheet,
+        db.tdatasheet.id.equalsExp(db.tdatasheetkeyword.datasheetId),
+      ),
+    ])
+      ..where(db.tdatasheet.factionId.equals(factionId));
+
+    final result = await query.get();
+    return result.length;
+  }
+
+  /// Получает количество costs для фракции
+  Future<int> getCostCountForFaction(String factionId) async {
+    final query = select(db.tdatasheetmodelcost).join([
+      innerJoin(
+        db.tdatasheet,
+        db.tdatasheet.id.equalsExp(db.tdatasheetmodelcost.datasheetId),
+      ),
+    ])
+      ..where(db.tdatasheet.factionId.equals(factionId));
+
+    final result = await query.get();
+    return result.length;
+  }
+
+  /// Проверяет, есть ли у datasheet costs
+  Future<bool> datasheetHasCosts(int datasheetId) async {
+    final query = select(db.tdatasheetmodelcost)
+      ..where((t) => t.datasheetId.equals(datasheetId));
+    final result = await query.get();
+    return result.isNotEmpty;
+  }
 }
 
 // ─────────────────────────────────────────────────────────

@@ -7,9 +7,7 @@ import '../screens/widgets/unit_list_item.dart';
 import '../screens/widgets/unit_selection_dialog.dart';
 import '../screens/widgets/unit_detail_popup.dart';
 import '../screens/widgets/bottom_nav_bar.dart';
-import '../database/database.dart';
 import '../database/queries/cross_table_queries.dart';
-import '../models/index.dart' as models;
 
 class BuilderScreen extends StatefulWidget {
   const BuilderScreen({super.key});
@@ -28,37 +26,37 @@ class _BuilderScreenState extends State<BuilderScreen> {
 
   bool _isLoading = false;
   String? _error;
-  String? _currentFactionId;
+  // String? _currentFactionId;
 
   // 🔹 Всегда показываем эти 7 секций
   final Map<String, Set<int>> _selectedUnits = {
-    'Лидеры': {},
-    'Элита': {},
-    'Бойцы': {},
-    'Поддержка': {},
-    'Транспорт': {},
-    'Укрепления': {},
-    'Дополнительно': {},
+    'Epic Hero': {},
+    'Characters': {},
+    'Battleline': {},
+    'Infantry': {},
+    'Vehicle': {},
+    'Dedicated Transports': {},
+    'Fortifications': {},
   };
 
   final Map<String, String> _roleToSection = {
-    'Leader': 'Лидеры',
-    'Elite': 'Элита',
-    'Troops': 'Бойцы',
-    'Support': 'Поддержка',
-    'Transport': 'Транспорт',
-    'Fortification': 'Укрепления',
-    'Other': 'Дополнительно',
+    'Epic Hero': 'Epic Hero',
+    'Characters': 'Characters',
+    'Battleline': 'Battleline',
+    'Infantry': 'Infantry',
+    'Vehicle': 'Vehicle',
+    'Dedicated Transports': 'Dedicated Transports',
+    'Fortifications': 'Fortifications',
   };
 
   final List<String> _sections = const [
-    'Лидеры',
-    'Элита',
-    'Бойцы',
-    'Поддержка',
-    'Транспорт',
-    'Укрепления',
-    'Дополнительно',
+    'Epic Hero',
+    'Characters',
+    'Battleline',
+    'Infantry',
+    'Vehicle',
+    'Dedicated Transports',
+    'Fortifications',
   ];
 
   @override
@@ -89,7 +87,7 @@ class _BuilderScreenState extends State<BuilderScreen> {
     setState(() {
       _isLoading = true;
       _error = null;
-      _currentFactionId = factionId;
+      // _currentFactionId = factionId;
     });
 
     try {
@@ -108,8 +106,17 @@ class _BuilderScreenState extends State<BuilderScreen> {
         _isLoading = false;
       });
 
-      print('✅ Загружено юнитов: ${_units.length}');
-    } catch (e, stack) {
+      /*print('✅ Загружено юнитов: ${_units.length}');
+      // Диагностика: смотрим у каких юнитов есть Epic Hero
+      print('\n🔍 ЮНИТЫ С KEYWORD "EPIC HERO":');
+      for (var unit in _units) {
+        final hasEpicHero =
+            unit.keywords.any((k) => k.keyword?.toLowerCase() == 'epic hero');
+        if (hasEpicHero) {
+          print('  📌 ${unit.datasheet.name} (role: ${unit.datasheet.role})');
+        }
+      }*/
+    } catch (e) {
       setState(() {
         _error = 'Ошибка загрузки: ${e.toString()}';
         _isLoading = false;
@@ -168,34 +175,37 @@ class _BuilderScreenState extends State<BuilderScreen> {
 
   /// Получаем количество доступных юнитов в секции
   int _getAvailableCountForSection(String section) {
-    int count = 0;
-    for (final unit in _units) {
-      if (!unit.hasCost) continue;
-      final role = unit.datasheet.role ?? 'Other';
-      final sectionName = _roleToSection[role] ?? 'Дополнительно';
-      if (sectionName == section) {
-        count++;
-      }
-    }
-    return count;
+    if (_units.isEmpty) return 0;
+    return _units.where((unit) => _getUnitSection(unit) == section).length;
   }
 
   /// Получаем выбранные юниты для секции
   List<UnitSummary> _getSelectedUnitsForSection(String section) {
+    if (_units.isEmpty) return [];
+
     final selectedIds = _selectedUnits[section] ?? {};
     return _units
         .where((unit) => selectedIds.contains(unit.datasheet.id))
         .toList();
   }
 
-  void _showUnitSelector(String category) {
-    // Собираем все юниты, подходящие для этой секции
-    final availableUnits = _units.where((unit) {
+  /// Получаем юниты для конкретной секции (для диалога выбора)
+  List<UnitSummary> _getUnitsForSection(String section) {
+    /*if (_units.isEmpty) return [];
+
+    return _units.where((unit) {
       if (!unit.hasCost) return false;
       final role = unit.datasheet.role ?? 'Other';
       final sectionName = _roleToSection[role] ?? 'Дополнительно';
-      return sectionName == category;
-    }).toList();
+      return sectionName == section;
+    }).toList();*/
+    if (_units.isEmpty) return [];
+    return _units.where((unit) => _getUnitSection(unit) == section).toList();
+  }
+
+  void _showUnitSelector(String category) {
+    print(category);
+    final availableUnits = _getUnitsForSection(category);
 
     if (availableUnits.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -295,60 +305,18 @@ class _BuilderScreenState extends State<BuilderScreen> {
           children: [
             _buildFactionHeader(appState),
 
-            if (_availableKeywords.isNotEmpty && !_isLoading)
-              _buildKeywordFilters(),
+            // Фильтры отображаем только если есть ключевые слова и не в состоянии загрузки
+            //if (_availableKeywords.isNotEmpty && !_isLoading)
+            //   _buildKeywordFilters(),
 
-            // ⚠️ ВАЖНО: Здесь всегда показываем список секций
+            // ВСЕГДА показываем секции, независимо от состояния загрузки
             Expanded(
-              child: _isLoading
-                  ? _buildLoadingIndicator()
-                  : _error != null
-                      ? _buildErrorWidget()
-                      : _buildSectionsList(), // ← Всегда показываем секции, даже если _units пустой
+              child: _buildSectionsList(),
             ),
 
             _buildBottomActions(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingIndicator() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(color: Colors.amber),
-          SizedBox(height: 16),
-          Text('Загрузка юнитов...', style: TextStyle(color: Colors.white70)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorWidget() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, color: Colors.red[300], size: 48),
-          const SizedBox(height: 12),
-          Text(
-            _error!,
-            style: const TextStyle(color: Colors.white70),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadData,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber,
-              foregroundColor: Colors.black,
-            ),
-            child: const Text('Повторить'),
-          ),
-        ],
       ),
     );
   }
@@ -433,28 +401,77 @@ class _BuilderScreenState extends State<BuilderScreen> {
     );
   }
 
-  /// ⚠️ КЛЮЧЕВОЙ МЕТОД: всегда строит список всех 7 секций
+  /// ⚠️ ВАЖНО: Всегда строим список всех 7 секций
   Widget _buildSectionsList() {
-    print('🔨 _buildSectionsList() вызван');
-    print('📊 _units.length = ${_units.length}');
+    // Если идет загрузка, показываем индикатор поверх секций
+    if (_isLoading) {
+      return Stack(
+        children: [
+          // Фоновые секции (полупрозрачные)
+          _buildSectionsContent(),
+          // Затемняющий слой с индикатором
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.amber),
+                  SizedBox(height: 16),
+                  Text('Загрузка юнитов...',
+                      style: TextStyle(color: Colors.white70)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
 
-    return ListView.builder(
+    // Если ошибка, показываем сообщение об ошибке
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, color: Colors.red[300], size: 48),
+            const SizedBox(height: 12),
+            Text(
+              _error!,
+              style: const TextStyle(color: Colors.white70),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadData,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.black,
+              ),
+              child: const Text('Повторить'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // В обычном состоянии показываем секции
+    return _buildSectionsContent();
+  }
+
+  /// Строит контент секций
+  Widget _buildSectionsContent() {
+    return ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: _sections.length,
-      itemBuilder: (context, index) {
-        final section = _sections[index];
-        print('📁 Строим секцию: $section');
+      children: _sections.map((section) {
         return _buildSection(section);
-      },
+      }).toList(),
     );
   }
 
   Widget _buildSection(String title) {
     final selectedUnits = _getSelectedUnitsForSection(title);
     final availableCount = _getAvailableCountForSection(title);
-
-    print(
-        '  📌 $title: selected=${selectedUnits.length}, available=$availableCount');
 
     return CollapsibleSection(
       title: title,
@@ -463,11 +480,13 @@ class _BuilderScreenState extends State<BuilderScreen> {
       onAddPressed: () => _showUnitSelector(title),
       children: selectedUnits.isEmpty
           ? [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
+              Container(
+                padding: const EdgeInsets.all(16),
                 child: Text(
-                  'Нет выбранных юнитов. Нажмите + чтобы добавить.',
-                  style: TextStyle(
+                  availableCount == 0
+                      ? 'В этой категории нет доступных юнитов'
+                      : 'Нет выбранных юнитов. Нажмите + чтобы добавить.',
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontStyle: FontStyle.italic,
                   ),
@@ -501,7 +520,6 @@ class _BuilderScreenState extends State<BuilderScreen> {
 
   Widget _buildBottomActions() {
     final maxPoints = context.read<AppState>().currentMaxPoints ?? 2000;
-    final isOverLimit = _totalPoints > maxPoints;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -512,7 +530,7 @@ class _BuilderScreenState extends State<BuilderScreen> {
         ),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // ⚠️ ВАЖНО: mainAxisSize.min
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (_totalPoints > maxPoints)
             Container(
@@ -573,5 +591,27 @@ class _BuilderScreenState extends State<BuilderScreen> {
         ],
       ),
     );
+  }
+
+  String _getUnitSection(UnitSummary unit) {
+    final keywords = unit.keywords.map((k) => k.keyword?.toLowerCase()).toSet();
+
+    final _unit = unit.datasheet.role?.toLowerCase();
+
+    if (_unit == 'characters') {
+      if (keywords.contains('epic hero')) {
+        return 'Epic Hero';
+      }
+    }
+    if (_unit == 'other') {
+      if (keywords.contains('infantry')) {
+        return 'Infantry';
+      }
+      if (keywords.contains('vehicle')) {
+        return 'Vehicle';
+      }
+    }
+    return _roleToSection[unit.datasheet.role] ?? 'Дополнительно';
+    //if (!unit.hasCost) return 'Дополнительно';
   }
 }

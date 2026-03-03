@@ -16,7 +16,7 @@ class CollapsibleSection extends StatefulWidget {
     this.selectedCount = 0,
     required this.children,
     this.onAddPressed,
-    this.initiallyExpanded = true,
+    this.initiallyExpanded = false,
   });
 
   @override
