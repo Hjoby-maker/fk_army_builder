@@ -14,11 +14,25 @@ class CrossTableQueries extends DatabaseAccessor<AppDatabase> {
   Future<List<UnitSummary>> getUnitsSummaryByFaction({
     required String factionId,
     List<String>? keywordFilter, // опциональная фильтрация по keywords
+    bool showLegendary = false,
   }) async {
     // 1. Получаем datasheets фракции через DAO
     final datasheetsData =
         await db.datasheetDao.getDatasheetsByFaction(factionId);
     if (datasheetsData.isEmpty) return [];
+
+    // Получаем информацию об источниках для определения легендарности
+    final sourceIds = datasheetsData.map((d) => d.sourceId).toSet().toList();
+    final sources =
+        await (select(db.tsource)..where((t) => t.id.isIn(sourceIds))).get();
+
+    // Создаем map sourceId -> является ли источник легендарным
+    final Map<int, bool> isLegendarySource = {};
+    for (var source in sources) {
+      // Проверяем, содержит ли название источника "Legends" (регистронезависимо)
+      final isLegendary = source.name.toLowerCase().contains('legends');
+      isLegendarySource[source.id] = isLegendary;
+    }
 
     final datasheetIds = datasheetsData.map((d) => d.id).toList();
 
@@ -57,6 +71,14 @@ class CrossTableQueries extends DatabaseAccessor<AppDatabase> {
     final results = <UnitSummary>[];
 
     for (final dsData in datasheetsData) {
+      // ⚠️ ИСПРАВЛЕНИЕ: используем уже созданный isLegendarySource
+      final isLegendary = isLegendarySource[dsData.sourceId] ?? false;
+
+      // Фильтруем легендарные юниты если showLegendary = false
+      if (!showLegendary && isLegendary) {
+        continue;
+      }
+
       final datasheet = _convertDatasheet(dsData);
       final keywords = keywordsByDsId[dsData.id] ?? [];
       final costs = costsByDsId[dsData.id] ?? [];
@@ -84,6 +106,7 @@ class CrossTableQueries extends DatabaseAccessor<AppDatabase> {
         costs: costs,
         minCost: minCost,
         maxCost: maxCost,
+        isLegendary: isLegendary, // ← теперь переменная определена
       ));
     }
 
@@ -288,6 +311,7 @@ class UnitSummary {
   final List<models.DatasheetModelCost> costs;
   final int? minCost;
   final int? maxCost;
+  final bool isLegendary;
 
   UnitSummary({
     required this.datasheet,
@@ -295,6 +319,7 @@ class UnitSummary {
     required this.costs,
     this.minCost,
     this.maxCost,
+    this.isLegendary = false,
   });
 
   /// Удобные геттеры для UI
@@ -321,4 +346,6 @@ class UnitSummary {
 
   /// Есть ли у юнита стоимость
   bool get hasCost => minCost != null || maxCost != null;
+
+  String get legendaryStatus => isLegendary ? ' (Legends)' : '';
 }

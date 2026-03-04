@@ -107,7 +107,9 @@ class _BuilderScreenState extends State<BuilderScreen>
   void _showArmyOption() {
     showDialog(
       context: context,
-      builder: (context) => const ArmyOption(),
+      builder: (context) => ArmyOption(
+        onSettingsChanged: _reloadData,
+      ),
     );
   }
 
@@ -167,6 +169,7 @@ class _BuilderScreenState extends State<BuilderScreen>
           factionId: factionId,
           keywordFilter:
               _selectedKeywords.isNotEmpty ? _selectedKeywords.toList() : null,
+          showLegendary: appState.showLegendaryUnits,
         ),
         _queries.getUniqueKeywordsByFaction(factionId),
       ]);
@@ -887,5 +890,10 @@ class _BuilderScreenState extends State<BuilderScreen>
         _configurationController.reverse();
       }
     });
+  }
+
+  Future<void> _reloadData() async {
+    // Просто вызываем существующий метод загрузки
+    await _loadData();
   }
 }

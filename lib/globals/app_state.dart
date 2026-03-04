@@ -22,6 +22,8 @@ class AppState extends ChangeNotifier {
 
   String? _currentDetachment;
   int? _currentDetachmentId;
+  // Поле для отображения легендарных юнитов
+  bool _showLegendaryUnits = false;
 
   // Геттеры для полей армии
   String? get currentArmyName => _currentArmyName;
@@ -32,6 +34,7 @@ class AppState extends ChangeNotifier {
 
   String? get currentDetachment => _currentDetachment;
   int? get currentDetachmentId => _currentDetachmentId;
+  bool get showLegendaryUnits => _showLegendaryUnits;
 
 // Геттер для DatabaseService
   DatabaseService get databaseService => _db;
@@ -116,6 +119,7 @@ class AppState extends ChangeNotifier {
     _currentMaxPoints = null;
     _currentDetachment = null;
     _currentDetachmentId = null;
+    _showLegendaryUnits = false;
     notifyListeners();
     print('Параметры армии сброшены');
   }
@@ -236,5 +240,11 @@ class AppState extends ChangeNotifier {
     _userPreferences.clear();
     resetDownloadStatus();
     notifyListeners();
+  }
+
+  void updateShowLegendaryUnits(bool value) {
+    _showLegendaryUnits = value;
+    notifyListeners();
+    print('Show legendary units updated to: $value');
   }
 }
