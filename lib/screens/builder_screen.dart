@@ -607,6 +607,7 @@ class _BuilderScreenState extends State<BuilderScreen>
           InkWell(
             onTap: _toggleConfiguration,
             child: Container(
+              height: 56.0,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.amber.withOpacity(0.2),
