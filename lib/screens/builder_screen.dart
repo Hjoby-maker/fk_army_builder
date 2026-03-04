@@ -780,16 +780,14 @@ class _BuilderScreenState extends State<BuilderScreen>
       final unit = units[i];
       final id = unit.datasheet.id;
 
-      // Генерируем уникальный ключ для каждого экземпляра
-      // Используем id + индекс для уникальности
       result.add(
         UnitListItem(
-          key: ValueKey('${id}_$i'), // ← уникальный ключ для каждого экземпляра
+          key: ValueKey('${id}_$i'), // уникальный ключ для каждого экземпляра
           name: unit.datasheet.name,
           cost: unit.minCost ?? 0,
           description: unit.keywordsString,
-          quantity: 1, // ← всегда 1, так как каждый экземпляр отдельно
-          instanceId: i, // ← передаем индекс для идентификации экземпляра
+          quantity: 1, // всегда 1, так как каждый экземпляр отдельно
+          instanceId: i, // передаем индекс для идентификации экземпляра
           isSelected: true,
           unit: unit,
           onSelectPressed: () {

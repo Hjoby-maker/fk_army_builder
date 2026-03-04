@@ -8,7 +8,7 @@ class UnitListItem extends StatelessWidget {
   final int cost;
   final String description;
   final int quantity;
-  final int instanceId; // ← новый параметр для идентификации экземпляра
+  final int instanceId;
   final bool isSelected;
   final UnitSummary? unit;
   final VoidCallback onSelectPressed;
@@ -19,7 +19,7 @@ class UnitListItem extends StatelessWidget {
     required this.cost,
     required this.description,
     this.quantity = 1,
-    this.instanceId = 0, // ← по умолчанию 0
+    this.instanceId = 0,
     required this.isSelected,
     this.unit,
     required this.onSelectPressed,
@@ -39,50 +39,20 @@ class UnitListItem extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        leading: Stack(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                cost.toString(),
-                style: const TextStyle(
-                  color: Colors.amber,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.amber.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            cost.toString(),
+            style: const TextStyle(
+              color: Colors.amber,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
-            // Индикатор номера экземпляра (для одинаковых юнитов)
-            if (instanceId > 0)
-              Positioned(
-                top: -4,
-                right: -4,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    '${instanceId + 1}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
+          ),
         ),
         title: Row(
           children: [
@@ -95,7 +65,7 @@ class UnitListItem extends StatelessWidget {
                 ),
               ),
             ),
-            // Добавляем индикатор легендарности если есть
+            // Индикатор легендарности если есть
             if (unit?.isLegendary ?? false)
               Container(
                 margin: const EdgeInsets.only(left: 8),
@@ -128,7 +98,7 @@ class UnitListItem extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Кнопка информации
+            // Кнопка информации (открывает детальный экран)
             IconButton(
               icon: const Icon(Icons.info_outline),
               color: Colors.amber,
@@ -142,21 +112,6 @@ class UnitListItem extends StatelessWidget {
                       );
                     }
                   : null,
-            ),
-            // Кнопка редактирования (для будущего функционала)
-            IconButton(
-              icon: const Icon(Icons.edit),
-              color: Colors.blue,
-              onPressed: () {
-                // TODO: открыть экран редактирования конкретного экземпляра
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text('Редактирование экземпляра ${instanceId + 1}'),
-                    backgroundColor: Colors.blue,
-                  ),
-                );
-              },
             ),
             // Кнопка удаления
             IconButton(
