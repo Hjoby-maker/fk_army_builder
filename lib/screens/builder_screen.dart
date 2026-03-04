@@ -5,7 +5,6 @@ import '../globals/app_state.dart';
 import '../screens/widgets/collapsible_section.dart';
 import '../screens/widgets/unit_list_item.dart';
 import '../screens/widgets/unit_selection_dialog.dart';
-import '../screens/widgets/unit_detail_popup.dart';
 import '../screens/widgets/bottom_nav_bar.dart';
 import '../screens/widgets/army_option.dart';
 import '../screens/widgets/detachment_dialog.dart';
@@ -240,7 +239,7 @@ class _BuilderScreenState extends State<BuilderScreen>
     return _units.where((unit) => _getUnitSection(unit) == section).length;
   }
 
-  /// Получаем выбранные юниты для секции
+  /// Получаем выбранные юниты для секции (с дубликатами)
   List<UnitSummary> _getSelectedUnitsForSection(String section) {
     if (_units.isEmpty) return [];
 
@@ -258,6 +257,29 @@ class _BuilderScreenState extends State<BuilderScreen>
     }
 
     return result;
+  }
+
+  /// Получает информацию о конкретном экземпляре юнита
+  Map<String, dynamic>? _getUnitInstanceInfo(
+      String sectionTitle, int unitId, int instanceId) {
+    final units = _getSelectedUnitsForSection(sectionTitle);
+    int currentInstance = 0;
+
+    for (int i = 0; i < units.length; i++) {
+      if (units[i].datasheet.id == unitId) {
+        if (currentInstance == instanceId) {
+          return {
+            'index': i,
+            'unit': units[i],
+            'instanceNumber': instanceId + 1,
+            'totalInstances':
+                units.where((u) => u.datasheet.id == unitId).length,
+          };
+        }
+        currentInstance++;
+      }
+    }
+    return null;
   }
 
   /// Получаем юниты для конкретной секции (для диалога выбора)
@@ -748,41 +770,73 @@ class _BuilderScreenState extends State<BuilderScreen>
     );
   }
 
-  /// Строит список юнитов с учетом количества
+  /// Строит список юнитов - каждый экземпляр отдельной строкой
   List<Widget> _buildUnitListWithQuantities(
       List<UnitSummary> units, String sectionTitle) {
-    final Map<int, int> quantities = {};
-    for (final unit in units) {
-      quantities[unit.datasheet.id] = (quantities[unit.datasheet.id] ?? 0) + 1;
+    final result = <Widget>[];
+
+    // Для каждого юнита в списке (с учетом дубликатов) создаем отдельный элемент
+    for (int i = 0; i < units.length; i++) {
+      final unit = units[i];
+      final id = unit.datasheet.id;
+
+      // Генерируем уникальный ключ для каждого экземпляра
+      // Используем id + индекс для уникальности
+      result.add(
+        UnitListItem(
+          key: ValueKey('${id}_$i'), // ← уникальный ключ для каждого экземпляра
+          name: unit.datasheet.name,
+          cost: unit.minCost ?? 0,
+          description: unit.keywordsString,
+          quantity: 1, // ← всегда 1, так как каждый экземпляр отдельно
+          instanceId: i, // ← передаем индекс для идентификации экземпляра
+          isSelected: true,
+          unit: unit,
+          onSelectPressed: () {
+            setState(() {
+              // Удаляем конкретный экземпляр по индексу
+              _removeUnitInstance(sectionTitle, id, i);
+            });
+          },
+        ),
+      );
     }
 
-    final result = <Widget>[];
-    for (final unit in units) {
-      final id = unit.datasheet.id;
-      if (quantities.containsKey(id)) {
-        final quantity = quantities[id]!;
-        result.add(
-          UnitListItem(
-            name: unit.datasheet.name,
-            cost: unit.minCost ?? 0,
-            description: unit.keywordsString,
-            quantity: quantity, // Новый параметр для отображения количества
-            isSelected: true,
-            onSelectPressed: () {
-              setState(() {
-                _selectedUnitsWithQuantity[sectionTitle]!.remove(id);
-              });
-            },
-            onInfoPressed: () => showDialog(
-              context: context,
-              builder: (ctx) => UnitDetailPopup(unit: unit),
-            ),
-          ),
-        );
-        quantities.remove(id); // Убираем, чтобы не дублировать
+    return result;
+  }
+
+  /// Удаляет конкретный экземпляр юнита
+  void _removeUnitInstance(String sectionTitle, int unitId, int instanceId) {
+    // Получаем текущий список выбранных юнитов для секции
+    final currentUnits = _getSelectedUnitsForSection(sectionTitle);
+
+    // Находим индекс этого конкретного экземпляра в общем списке
+    int instanceIndex = -1;
+    int currentInstanceCount = 0;
+
+    for (int i = 0; i < currentUnits.length; i++) {
+      if (currentUnits[i].datasheet.id == unitId) {
+        if (currentInstanceCount == instanceId) {
+          instanceIndex = i;
+          break;
+        }
+        currentInstanceCount++;
       }
     }
-    return result;
+
+    if (instanceIndex != -1) {
+      // Создаем новый список без этого экземпляра
+      final updatedUnits = List<UnitSummary>.from(currentUnits)
+        ..removeAt(instanceIndex);
+
+      // Обновляем _selectedUnitsWithQuantity
+      final quantityMap = <int, int>{};
+      for (final unit in updatedUnits) {
+        quantityMap[unit.datasheet.id] =
+            (quantityMap[unit.datasheet.id] ?? 0) + 1;
+      }
+      _selectedUnitsWithQuantity[sectionTitle] = quantityMap;
+    }
   }
 
   Widget _buildBottomActions() {
