@@ -259,29 +259,6 @@ class _BuilderScreenState extends State<BuilderScreen>
     return result;
   }
 
-  /// Получает информацию о конкретном экземпляре юнита
-  Map<String, dynamic>? _getUnitInstanceInfo(
-      String sectionTitle, int unitId, int instanceId) {
-    final units = _getSelectedUnitsForSection(sectionTitle);
-    int currentInstance = 0;
-
-    for (int i = 0; i < units.length; i++) {
-      if (units[i].datasheet.id == unitId) {
-        if (currentInstance == instanceId) {
-          return {
-            'index': i,
-            'unit': units[i],
-            'instanceNumber': instanceId + 1,
-            'totalInstances':
-                units.where((u) => u.datasheet.id == unitId).length,
-          };
-        }
-        currentInstance++;
-      }
-    }
-    return null;
-  }
-
   /// Получаем юниты для конкретной секции (для диалога выбора)
   List<UnitSummary> _getUnitsForSection(String section) {
     if (_units.isEmpty) return [];
