@@ -21,3 +21,4 @@ export 'stratagem.dart';
 
 export 'army.dart';
 export 'army_unit.dart';
+export 'unit_composition.dart';

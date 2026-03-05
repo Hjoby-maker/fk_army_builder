@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
+import 'package:fk_army_builder/models/unit_composition.dart';
 import '../database.dart';
 import '../../models/index.dart' as models;
+import 'package:fk_army_builder/utils/composition_parser.dart';
 
 /// Класс для сложных кросс-табличных запросов
 /// Наследует DatabaseAccessor для доступа к select() и таблицам через db.*
@@ -177,6 +179,109 @@ class CrossTableQueries extends DatabaseAccessor<AppDatabase> {
               cost: c.cost,
             ))
         .toList();
+  }
+
+  /// Получает информацию о составе юнита
+  Future<UnitComposition?> getUnitComposition(int datasheetId) async {
+    // Получаем composition записи
+    final compositionQuery = select(db.tdatasheetunitcomposition)
+      ..where((t) => t.datasheetId.equals(datasheetId))
+      ..orderBy([(t) => OrderingTerm(expression: t.line)]);
+
+    final compositionData = await compositionQuery.get();
+
+    if (compositionData.isEmpty) return null;
+
+    // Получаем costs для этого юнита
+    final costsQuery = select(db.tdatasheetmodelcost)
+      ..where((t) => t.datasheetId.equals(datasheetId));
+
+    final costsData = await costsQuery.get();
+
+    // Для отладки - выведем все costs
+    print('📊 Costs for datasheet $datasheetId:');
+    for (var cost in costsData) {
+      print('  - line ${cost.line}: ${cost.description} = ${cost.cost} pts');
+    }
+
+    // Определяем максимальное количество моделей из costs
+    int maxModels = 0;
+    final Map<int, int> costByLine = {}; // для хранения стоимости по line
+
+    for (final cost in costsData) {
+      costByLine[cost.line] = cost.cost!;
+
+      if (cost.description != null) {
+        final count = CompositionParser.parseModelCount(cost.description!);
+        if (count > maxModels) {
+          maxModels = count;
+        }
+        print('  📏 Parsed model count: $count from "${cost.description}"');
+      }
+    }
+
+    // Парсим компоненты
+    final components = <UnitComponent>[];
+
+    for (final comp in compositionData) {
+      if (comp.description != null) {
+        print(
+            '\n📝 Parsing component: "${comp.description}" at line ${comp.line}');
+        final parsed = CompositionParser.parseComponent(comp.description!);
+        print(
+            '  Parsed: name="${parsed.name}", min=${parsed.min}, max=${parsed.max}');
+
+        // Ищем стоимость для этого компонента
+        // Сначала пробуем найти по line из composition
+        int costPerModel = costByLine[comp.line] ?? 0;
+
+        // Если не нашли по line, пробуем найти по названию в описании cost
+        if (costPerModel == 0) {
+          for (final cost in costsData) {
+            if (cost.description != null &&
+                cost.description!
+                    .toLowerCase()
+                    .contains(parsed.name.toLowerCase())) {
+              costPerModel = cost.cost ?? 0;
+              print(
+                  '  Found cost by name: ${cost.description} = $costPerModel pts');
+              break;
+            }
+          }
+        } else {
+          print('  Found cost by line ${comp.line}: $costPerModel pts');
+        }
+
+        components.add(UnitComponent(
+          name: parsed.name,
+          minCount: parsed.min,
+          maxCount: parsed.max,
+          costPerModel: costPerModel,
+        ));
+      }
+    }
+
+    // Если не нашли maxModels из costs, используем сумму max из компонентов
+    if (maxModels == 0) {
+      maxModels = components.fold(0, (sum, comp) => sum + comp.maxCount);
+    }
+
+    // Минимальное количество моделей - сумма min из компонентов
+    final minModels = components.fold(0, (sum, comp) => sum + comp.minCount);
+
+    print('\n📊 Final composition:');
+    print('  Min models: $minModels, Max models: $maxModels');
+    for (var comp in components) {
+      print(
+          '  - ${comp.name}: ${comp.minCount}-${comp.maxCount} @ ${comp.costPerModel} pts');
+    }
+
+    return UnitComposition(
+      datasheetId: datasheetId,
+      components: components,
+      minModels: minModels,
+      maxModels: maxModels,
+    );
   }
 
   // ─────────────────────────────────────────────────────────

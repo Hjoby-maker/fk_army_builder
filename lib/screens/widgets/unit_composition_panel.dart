@@ -1,8 +1,10 @@
 // lib/screens/widgets/unit_composition_panel.dart
+import 'package:fk_army_builder/models/index.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../database/queries/cross_table_queries.dart';
 import '../../globals/app_state.dart';
+import 'unit_composition_editor.dart'; // Добавьте этот импорт
 
 class UnitCompositionPanel extends StatefulWidget {
   final UnitSummary unit;
@@ -38,6 +40,15 @@ class _UnitCompositionPanelState extends State<UnitCompositionPanel> {
     _isWarlord = appState.warlordUnitId == widget.unit.datasheet.id;
   }
 
+  // ⬇️ ПЕРЕМЕЩАЕМ ФУНКЦИЮ ВНУТРЬ КЛАССА
+  Future<UnitComposition?> _loadComposition() async {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final db = appState.databaseService.database;
+    final queries = CrossTableQueries(db);
+
+    return await queries.getUnitComposition(widget.unit.datasheet.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -54,39 +65,92 @@ class _UnitCompositionPanelState extends State<UnitCompositionPanel> {
         ),
         const SizedBox(height: 8),
 
-        // Список моделей в составе
-        if (widget.unit.costs.isNotEmpty)
-          ...widget.unit.costs.map((cost) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black26,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.amber.withOpacity(0.2),
+        // FutureBuilder для загрузки композиции
+        FutureBuilder<UnitComposition?>(
+          future: _loadComposition(), // ← теперь функция доступна
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(color: Colors.amber),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      cost.description ?? 'Model ${cost.line}',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  Text(
-                    '${cost.cost} pts',
-                    style: const TextStyle(
-                      color: Colors.amber,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+              );
+            }
+
+            if (snapshot.hasError) {
+              print('Error loading composition: ${snapshot.error}');
+              return Container(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Error loading composition: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+
+            if (!snapshot.hasData || snapshot.data == null) {
+              return const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'No composition data available',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              );
+            }
+
+            final composition = snapshot.data!;
+
+            return Column(
+              children: [
+                // Список моделей в составе (из costs)
+                if (widget.unit.costs.isNotEmpty)
+                  ...widget.unit.costs.map((cost) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.amber.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              cost.description ?? 'Model ${cost.line}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          Text(
+                            '${cost.cost} pts',
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+
+                const SizedBox(height: 16),
+
+                // Редактор состава
+                UnitCompositionEditor(
+                  composition: composition,
+                  onChanged: (selectedCounts) {
+                    // Здесь можно обновлять стоимость юнита в AppState
+                    print('Selected counts: $selectedCounts');
+                  },
+                ),
+              ],
             );
-          }),
+          },
+        ),
 
         const SizedBox(height: 16),
 
