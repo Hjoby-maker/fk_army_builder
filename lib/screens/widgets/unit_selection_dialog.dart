@@ -375,7 +375,7 @@ class _UnitSelectionDialogState extends State<UnitSelectionDialog> {
                   onTap: () => _incrementQuantity(unit.datasheet.id),
                   child: Container(
                     padding: const EdgeInsets.all(8),
-                    child: Icon(
+                    child: const Icon(
                       Icons.add,
                       color: Colors.amber,
                       size: 18,

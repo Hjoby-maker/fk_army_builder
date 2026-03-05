@@ -25,7 +25,7 @@ class _BuilderScreenState extends State<BuilderScreen>
   late CrossTableQueries _queries;
   bool _isConfigurationExpanded = false; // По умолчанию свернута
   List<UnitSummary> _units = [];
-  Set<String> _selectedKeywords = {};
+  final Set<String> _selectedKeywords = {};
 
   bool _isLoading = false;
   String? _error;
@@ -842,9 +842,9 @@ class _BuilderScreenState extends State<BuilderScreen>
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.black26,
-        border: const Border(
+        border: Border(
           top: BorderSide(color: Colors.amber, width: 0.5),
         ),
       ),
@@ -915,14 +915,14 @@ class _BuilderScreenState extends State<BuilderScreen>
   String _getUnitSection(UnitSummary unit) {
     final keywords = unit.keywords.map((k) => k.keyword?.toLowerCase()).toSet();
 
-    final _unit = unit.datasheet.role?.toLowerCase();
+    final unit0 = unit.datasheet.role?.toLowerCase();
 
-    if (_unit == 'characters') {
+    if (unit0 == 'characters') {
       if (keywords.contains('epic hero')) {
         return 'Epic Hero';
       }
     }
-    if (_unit == 'other') {
+    if (unit0 == 'other') {
       if (keywords.contains('infantry')) {
         return 'Infantry';
       }
