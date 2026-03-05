@@ -9,6 +9,7 @@ class UnitListItem extends StatelessWidget {
   final String description;
   final int quantity;
   final int instanceId;
+  final String sectionTitle;
   final bool isSelected;
   final UnitSummary? unit;
   final VoidCallback onSelectPressed;
@@ -19,7 +20,8 @@ class UnitListItem extends StatelessWidget {
     required this.cost,
     required this.description,
     this.quantity = 1,
-    this.instanceId = 0,
+    required this.instanceId, // ← делаем required
+    required this.sectionTitle,
     required this.isSelected,
     this.unit,
     required this.onSelectPressed,
@@ -107,7 +109,11 @@ class UnitListItem extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => UnitDetailScreen(unit: unit!),
+                          builder: (context) => UnitDetailScreen(
+                            unit: unit!,
+                            instanceId: instanceId,
+                            sectionTitle: sectionTitle,
+                          ),
                         ),
                       );
                     }

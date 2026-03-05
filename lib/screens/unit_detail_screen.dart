@@ -10,10 +10,14 @@ import '../screens/widgets/leader_panel.dart';
 
 class UnitDetailScreen extends StatefulWidget {
   final UnitSummary unit;
+  final int instanceId;
+  final String sectionTitle;
 
   const UnitDetailScreen({
     super.key,
     required this.unit,
+    required this.instanceId,
+    required this.sectionTitle,
   });
 
   @override
@@ -69,9 +73,14 @@ class _UnitDetailScreenState extends State<UnitDetailScreen> {
               title: 'Unit Composition',
               icon: Icons.groups,
               initiallyExpanded: true,
-              content: UnitCompositionPanel(unit: widget.unit),
+              content: UnitCompositionPanel(
+                unit: widget.unit,
+                instanceId:
+                    widget.instanceId, // нужно передать из builder_screen
+                sectionTitle:
+                    widget.sectionTitle, // нужно передать из builder_screen
+              ),
             ),
-
             const SizedBox(height: 8),
 
             // 2. Profile Panel

@@ -19,6 +19,7 @@ class AppState extends ChangeNotifier {
   String? _currentFaction;
   String? _currentFactionId; // ← НОВОЕ ПОЛЕ для ID фракции
   int? _currentMaxPoints;
+  int? _warlordUnitId;
 
   String? _currentDetachment;
   int? _currentDetachmentId;
@@ -31,6 +32,7 @@ class AppState extends ChangeNotifier {
   String? get currentFaction => _currentFaction;
   String? get currentFactionId => _currentFactionId; // ← НОВЫЙ ГЕТТЕР
   int? get currentMaxPoints => _currentMaxPoints;
+  int? get warlordUnitId => _warlordUnitId;
 
   String? get currentDetachment => _currentDetachment;
   int? get currentDetachmentId => _currentDetachmentId;
@@ -115,11 +117,12 @@ class AppState extends ChangeNotifier {
     _currentArmyName = null;
     _currentFactionType = null;
     _currentFaction = null;
-    _currentFactionId = null; // ← СБРАСЫВАЕМ ID
+    _currentFactionId = null;
     _currentMaxPoints = null;
     _currentDetachment = null;
     _currentDetachmentId = null;
     _showLegendaryUnits = false;
+    _warlordUnitId = null;
     notifyListeners();
     print('Параметры армии сброшены');
   }
@@ -246,5 +249,11 @@ class AppState extends ChangeNotifier {
     _showLegendaryUnits = value;
     notifyListeners();
     print('Show legendary units updated to: $value');
+  }
+
+  void setWarlord(int? unitId) {
+    _warlordUnitId = unitId;
+    notifyListeners();
+    print('Warlord set to unit ID: $unitId');
   }
 }

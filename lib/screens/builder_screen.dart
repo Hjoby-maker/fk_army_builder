@@ -788,8 +788,10 @@ class _BuilderScreenState extends State<BuilderScreen>
           description: unit.keywordsString,
           quantity: 1, // всегда 1, так как каждый экземпляр отдельно
           instanceId: i, // передаем индекс для идентификации экземпляра
+          sectionTitle: sectionTitle,
           isSelected: true,
           unit: unit,
+
           onSelectPressed: () {
             setState(() {
               // Удаляем конкретный экземпляр по индексу
